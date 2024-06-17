@@ -40,8 +40,8 @@
 - Table `memes` - (id, path_img)
 - Table `captions` - (id, description)
 - Table `best_captions` - (meme_ID, caption_ID)
-- Table `rounds` - (round_ID, meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point)
-- Table `games` - (id, user_id, first_round_ID, second_round_ID, third_round_ID, date)
+- Table `rounds` - (id, meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point, game_ID)
+- Table `games` - (id, user_id, date)
 
 ## Screenshots
 
