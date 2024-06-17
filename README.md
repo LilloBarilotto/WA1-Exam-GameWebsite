@@ -19,21 +19,21 @@
 
 
 ## API Server
-
-- POST `/api/something`: purpose
-  - request parameters and request body content
-  - response body content
-  - response status codes and possible errors
-- GET `/api/something`: purpose
+- GET `/users`: Get a ranking about all users! Show username and total point.
+- GET `/users/:username`: Get Info about the user. Show username and total point. User must be logged in -> Is same user through also the email
   - request parameters
   - response body content
   - response status codes and possible errors
-- PUT `/api/something`: purpose
-  - request parameters and request body content
-  - response body content
-  - response status codes and possible errors
-- ...
 
+- GET `/games`: Show history of all games by the logged user
+
+- GET `/games/:game_id`: Show info, from history, about a single game of a user
+
+- GET `/rounds/:round_id`: Show info about a specific round  
+
+- POST `/rounds`: Add a round. Automatically showned if not logged user, otherwise stored temporally and go to next round
+
+- POST `/games`: Add a games. 
 ## Database Tables
 
 - Table `users` - (id, username, email, password, salt, total_point)
