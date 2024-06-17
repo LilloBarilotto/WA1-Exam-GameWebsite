@@ -36,10 +36,12 @@
 
 ## Database Tables
 
-- Table `users` - short description of its contents
-- Table `something` - short description of its contents
-- ...
-
+- Table `users` - (id, username, email, password, salt, total_point)
+- Table `memes` - (id, path_img)
+- Table `captions` - (id, description)
+- Table `best_captions` - (meme_ID, caption_ID)
+- Table `rounds` - (round_ID, meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point)
+- Table `games` - (id, user_id, first_round_ID, second_round_ID, third_round_ID, date
 
 ## Screenshots
 
