@@ -5,19 +5,33 @@ import crypto from "crypto";
 
 export default function UserDAO (){
 
-    this.getUser = (username) =>{
+    this.getUsers = () => {
         return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+            db.all('SELECT * FROM users', (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row);
+                    const users = rows.map(user => ({ id: user.user_id, username: user.username, email: user.email , point: user.point}));
+                    resolve(users);
                 }
             });
         });
     }
 
-    this.getUserByCredentials = (email, password) => {
+    this.getUserById = (id) => {
+        return new Promise((resolve, reject) => {
+            db.get('SELECT * FROM users WHERE user_id = ?', [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const user = { id: row.user_id, username: row.username, email: row.email , point: user.point};
+                    resolve(user);
+                }
+            });
+        });
+    };
+
+    this.getUser = (email, password) => {
         return new Promise((resolve, reject) => {
             const sql = 'SELECT * FROM users WHERE email=?';
             db.get(sql, [email], (err, row) => {
@@ -27,14 +41,14 @@ export default function UserDAO (){
                     resolve(false);
                 }
                 else {
-                    const user = { id: row.user_id, username: row.username, email: row.email };
-
                     crypto.scrypt(password, row.salt, 32, function (err, hashedPassword) {
                         if (err) reject(err);
                         if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
                             resolve(false);
-                        else
+                        else{
+                            const user = { id: row.user_id, username: row.username, email: row.email , point: user.point};
                             resolve(user);
+                        }
                     });
                 }
             });
