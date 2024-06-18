@@ -39,7 +39,8 @@
 - GET `/captions/`: retrieve all captions
 - GET `/captions/random`: retrieve random captions
 - GET `/captions/random`: retrieve 2 random captions from best caption of a specific meme
- 
+- GET `/rounds/:round_id/captions/best_caption`: show the best caption showed into the specific round //TODO
+
 
 ### Games
 - POST `/games`: Add a games and the three rounds !
