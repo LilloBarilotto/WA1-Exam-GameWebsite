@@ -84,9 +84,6 @@ const isLoggedIn = (req, res, next) => {
 
 
 
-
-
-
 /************************************* USER'S API ****************************************/
 
 app.post('/api/sessions', function (req, res, next) {
@@ -123,7 +120,7 @@ app.get('/api/sessions/current', (req, res) => {
   }
   else
     res.status(401).json({ error: 'Unauthenticated user!' });
-});
+}); 
 
 
 /************************************* MEME'S API ****************************************/
@@ -156,10 +153,16 @@ app.get('/api/games', isLoggedIn, (req, res) => {
 app.post('/api/games', isLoggedIn, (req, res) => {
   gameDao.createGame(req.user.id)
     .then(game =>{
-   //   rounds = body.rounds.map(round => {id: round.id, caption: round.caption, meme: round.meme}); 
-      res.status(201).json(game);
-    })
+      let rounds = req.body.rounds.map(round => ({...round, game_ID: game.id}));
+      
+      Promise.all(rounds.map(round => gameDao.addRound(round)))
+        .then(() => res.status(201).json(game))
+        .catch(() => {
+          gameDao.deleteGame(game.id);  // Add DELETE ON CASCADE to the 'rounds' table in the db
+          res.status(500).end();
+        })
     .catch(() => res.status(500).end());
+    });
 });
 
 //aggiungere controllo per vedere se l'utente ha richiesto un suo game e non di altri utenti

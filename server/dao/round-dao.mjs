@@ -63,5 +63,17 @@ export default function RoundDAO() {
             });
         });
     }
+
+    this.deleteGame = (gameId) => {
+        return new Promise((resolve, reject) => {
+            db.run('DELETE FROM games WHERE id = ?', [gameId], function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.changes);
+                }
+            });
+        });
+    }
     
 };
