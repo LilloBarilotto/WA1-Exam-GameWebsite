@@ -11,7 +11,7 @@ export default function UserDAO (){
                 if (err) {
                     reject(err);
                 } else {
-                    const users = rows.map(user => ({ id: user.user_id, username: user.username, email: user.email , point: user.point}));
+                    const users = rows.map(user => ({ id: user.id, username: user.username, email: user.email , point: user.point}));
                     resolve(users);
                 }
             });
@@ -24,7 +24,7 @@ export default function UserDAO (){
                 if (err) {
                     reject(err);
                 } else {
-                    const user = { id: row.user_id, username: row.username, email: row.email , point: user.point};
+                    const user = { id: row.id, username: row.username, email: row.email , point: row.point};
                     resolve(user);
                 }
             });
@@ -46,7 +46,7 @@ export default function UserDAO (){
                         if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
                             resolve(false);
                         else{
-                            const user = { id: row.user_id, username: row.username, email: row.email , point: user.point};
+                            const user = { id: row.id, username: row.username, email: row.email , point: row.point};
                             resolve(user);
                         }
                     });
