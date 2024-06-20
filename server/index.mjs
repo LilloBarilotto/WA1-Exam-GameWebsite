@@ -2,11 +2,12 @@
 import express from 'express';
 import morgan from 'morgan';
 import session from 'express-session';
+import cors from 'cors';
 
 import { body, validationResult, check } from 'express-validator';
 
 import passport from 'passport';
-import passportLocal from 'passport-local';
+import LocalStrategy from 'passport-local';
 
 import UserDAO from './dao/user-dao.mjs';
 import MemeDAO from './dao/meme-dao.mjs';
@@ -14,43 +15,30 @@ import RoundDAO from './dao/round-dao.mjs';
 import CaptionDAO from './dao/caption-dao.mjs';
 
 
-// init express and Dao modules
-const app = new express();
-const port = 3001;
-
 const userDAO = new UserDAO();
 const memeDAO = new MemeDAO();
 const gameDAO = new RoundDAO();
 const captionDAO = new CaptionDAO();
 
-// activate the server
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+// init express and Dao modules
+const app = express();
+const port = 3001;
+app.use(morgan('dev'));
+app.use(express.json());
 
-// initialize and configure HTTP sessions
-app.use(session({
-  secret: 'Pero quanto a te, quanto quel che non puoi fare per tu per te qualcosa da poter fare potrebbe esserci',
-  resave: false,
-  saveUninitialized: false
-}));
-
-// tell passport to use session cookies
-app.use(passport.initialize());
-app.use(passport.session());
-
+/** Set up and enable Cross-Origin Resource Sharing (CORS) **/
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  credentials: true
+};
+app.use(cors(corsOptions));
 
 /** Initialize and configure passport */
-passport.use(new passportLocal.Strategy((email, password, done) => {
-  /** verification callback for authentication */
-  userDao.getUser(email, password).then(user => {
-    if (user)
-      done(null, user);
-    else
-      done(null, false, { message: 'email or password wrong' });
-  }).catch(err => {
-    done(err);
-  });
+passport.use(new LocalStrategy(async function verify(email, password, callback) {
+  const user = await userDAO.getUser(email, password);
+    if (!user)
+      return callback(null, false, 'Incorrect email and/or password.');
+    return callback(null, user);
 }));
 
 /** serialize and de-serialize the user (user object <-> session)
@@ -72,6 +60,14 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+// initialize and configure HTTP sessions
+app.use(session({
+  secret: 'Pero quanto a te, quanto quel che non puoi fare per tu per te qualcosa da poter fare potrebbe esserci',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.authenticate('session'));
+
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated())
     // SE SONO AUTENTICATO POSSO PROCEDERE A CHIAMARE LA FUNZIONE CHE SEGUE, CHE SARA' IL CORPO DELLE RICHIESTE GET/POST
@@ -92,6 +88,7 @@ app.post('/api/sessions', function (req, res, next) {
       return next(err);
     if (!user) {
       // display wrong login messages
+      console.log(user)
       return res.status(401).json(info);
     }
     // success, perform the login
@@ -207,4 +204,11 @@ app.get('api/captions/random', (req, res) => {
   captionDao.getCaptionsN(5)
     .then(captions => res.json(captions))
     .catch(() => res.status(500).end());
+});
+
+
+
+/************************************* Activate the server ****************************************/
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
 });

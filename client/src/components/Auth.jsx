@@ -11,13 +11,13 @@ function LoginForm(props) {
   const [show, setShow] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
- // const navigate = useNavigate();
+ const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const credentials = { email, password };
 
-    props.login(credentials)
+    props.handleLogin(credentials)
       .then ( () => navigate( "/" ) )
       .catch( (err) => {
         if(err.message === "Unauthorized")
@@ -80,7 +80,7 @@ LogoutButton.propTypes = {
 }
 
 function LoginButton() {
-//  const navigate = useNavigate();
+const navigate = useNavigate();
   return (
     <Button variant="outline-light" onClick={()=> navigate('/login')}>Login</Button>
   )

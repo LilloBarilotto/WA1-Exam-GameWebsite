@@ -1,6 +1,7 @@
+const SERVER_URL = 'http://localhost:3001/api';
 /*********************************** MEME'S API *********************************************/
 async function getMemes() {
-  const response = await fetch('/api/memes');
+  const response = await fetch(SERVER_URL + '/memes');
   
   if (!response.ok) {
     throw new Error('Failed to fetch memes');
@@ -10,7 +11,7 @@ async function getMemes() {
 }
 
 async function getMeme(id) {
-    const response = await fetch(`/api/memes/${id}`);
+    const response = await fetch(SERVER_URL + `/memes/${id}`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch meme with id ' + id);
@@ -21,7 +22,7 @@ async function getMeme(id) {
 
 /*********************************** GAME'S API *********************************************/
 async function getGames() {
-    const response = await fetch('/api/games');
+    const response = await fetch(SERVER_URL + '/games');
     
     if (!response.ok) {
         throw new Error('Failed to fetch games');
@@ -31,7 +32,7 @@ async function getGames() {
 }
 
 async function getGame(id) {
-    const response = await fetch(`/api/games/${id}`);
+    const response = await fetch(SERVER_URL + `/games/${id}`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch game with id ' + id);
@@ -41,7 +42,7 @@ async function getGame(id) {
 }
 
 async function getRound(id) {
-    const response = await fetch(`/api/rounds/${id}`);
+    const response = await fetch(SERVER_URL + `/rounds/${id}`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch round with id ' + id);
@@ -52,7 +53,7 @@ async function getRound(id) {
 
 //TODO non esiste attualmente questa API
 async function getRounds(id) {
-    const response = await fetch(`/api/games/${id}/rounds`);
+    const response = await fetch(SERVER_URL + `/games/${id}/rounds`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch rounds of game with id ' + id);
@@ -62,24 +63,25 @@ async function getRounds(id) {
 }
 
 /*********************************** USER'S API *********************************************/
-async function login(email, password) {
-    const response = await fetch('/api/sessions', {
+async function login(credentials) {
+    const response = await fetch(SERVER_URL + '/sessions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+        body: JSON.stringify({credentials}),
     });
     
     if (!response.ok) {
         throw new Error('Failed to login');
     }
     
-    return response.json().username;
+    return response.json();
 }
 
 async function logout() {
-    const response = await fetch('/api/sessions/current', {
+    const response = await fetch(SERVER_URL + '/sessions/current', {
         method: 'DELETE',
     });
     
@@ -89,7 +91,7 @@ async function logout() {
 }
 
 async function getCurrentUser() {
-    const response = await fetch('/api/sessions/current');
+    const response = await fetch(SERVER_URL + '/sessions/current');
     
     if (!response.ok) {
         throw new Error('Failed to get current user');
@@ -99,7 +101,7 @@ async function getCurrentUser() {
 }
 
 async function getUsers() {
-    const response = await fetch('/api/users');
+    const response = await fetch(SERVER_URL + '/users');
     
     if (!response.ok) {
         throw new Error('Failed to get users and their ranking');
@@ -110,7 +112,7 @@ async function getUsers() {
 
 /*********************************** CAPTION'S API*********************************************/
 async function getCaptions() {
-    const response = await fetch('/api/captions');
+    const response = await fetch(SERVER_URL + '/captions');
     
     if (!response.ok) {
         throw new Error('Failed to fetch captions');
@@ -120,7 +122,7 @@ async function getCaptions() {
 }
 
 async function getCaption(id) {
-    const response = await fetch(`/api/captions/${id}`);
+    const response = await fetch(SERVER_URL + `/captions/${id}`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch caption with id ' + id);
@@ -130,7 +132,7 @@ async function getCaption(id) {
 }
 
 async function getBestCaption(id) {
-    const response = await fetch(`/api/rounds/${id}/captions/best_captions`);
+    const response = await fetch(SERVER_URL + `/rounds/${id}/captions/best_captions`);
     
     if (!response.ok) {
         throw new Error('Failed to fetch best caption of round with id ' + id);

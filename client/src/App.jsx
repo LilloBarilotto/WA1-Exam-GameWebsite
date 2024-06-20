@@ -1,43 +1,26 @@
 import { useEffect, useState } from 'react'
-// import {Container, Toast, ToastBody} from 'react-bootstrap/';
-import {Route, Routes, useLocation, Navigate} from 'react-router-dom';
+import {Container, ToastBody, Toast} from 'react-bootstrap/';
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 
-
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
 import API from "./API.mjs";
-// import { LoginButton, LogoutButton } from './components/Auth.mjs';
+
+import { NotFoundLayout , Home} from './components/PageLayout.jsx';
+import {LoginForm}  from './components/Auth.jsx';
 import GameNavBar from './components/GameNavBar.jsx';
 
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [user, setUser] = useState(null)
-  const [loggedIn, setLoggedIn] = useState(false)
-  
-  const [rounds, setRounds] = useState([]);
-  const [meme, setMeme] = useState(null);
-  const [game, setGame] = useState(null);
-  const [games, setGames] = useState([]);
 
-  //const pathname = useLocation();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  useEffect(() => {
-    // check if the user is logged in
-    API.getCurrentUser()
-      .then(user => {
-        setUser(user);
-        setLoggedIn(true);
-      })
-      .catch(() => {
-        setUser(null);
-        setLoggedIn(false);
-      });
-  }, []);
-
-  const handleLogin = async (email, password) => {
-    API.login(email, password)
+  const handleLogin = async (credentials) => {
+    API.login(credentials)
       .then(user => {
         setUser(user);
         setLoggedIn(true);
@@ -53,11 +36,6 @@ function App() {
       .then(() => {
         setUser(null);
         setLoggedIn(false);
-        
-        setGame(null);
-        setGames([]);
-        setRounds([]);
-        setCount(0);
       })
       .catch(err => {
         setFeedback(err.message);
@@ -66,26 +44,26 @@ function App() {
 
   return (
     <div className="min-vh-100 d-flex flex-column">
-    <GameNavBar loggedIn={loggedIn} handleLogout={handleLogout} />
-    {/*
+    <GameNavBar loggedIn={loggedIn} handleLogout={handleLogout}/>
       <Container fluid className="flex-grow-1 d-flex flex-column">
-        
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={loggedIn ? <Navigate replace to='/'/> : <Login onLogin={handleLogin} />} />
-          
-          <Route path="/games" element={loggedIn ? <Games games={games} setGames={setGames} /> : <Navigate replace to='/login'/>} />
-          <Route path="/games/:gameID" element={loggedIn ? <Game game={game} setGame={setGame} rounds={rounds} setRounds={setRounds}/> : <Navigate replace to='/login'/>} />
-
-          <Route path="/users" element={loggedIn ? <Users /> : <Navigate replace to='/login'/>} />
-          <Route path="/users/:userID" element={loggedIn ? <User /> : <Navigate replace to='/login'/>} />
-
+          <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback}/>} />
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
-       
+        <Toast
+                        show={feedback !== ''}
+                        autohide
+                        onClose={() => setFeedback('')}
+                        delay={4000}
+                        position="top-end"
+                        className="position-fixed end-0 m-3"
+                    >
+                        <ToastBody>
+                            {feedback}
+                        </ToastBody>
+                    </Toast>
       </Container>
-      <GameFooter />
-      */}
     </div>
   );
 
