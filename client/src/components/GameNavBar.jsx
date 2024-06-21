@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {Button, Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import { LoginButton, LogoutButton } from "./Auth";
 
 function GameNavBar(props) {

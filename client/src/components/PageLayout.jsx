@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import {Row, Col, ListGroup, ListGroupItem, Button} from "react-bootstrap";
 import { Link } from "react-router-dom";
+
+import API from "../API";
 
 function RoundLayout(props) {
     return (
@@ -10,7 +13,7 @@ function RoundLayout(props) {
                 </Col>
             </Row>
             <Row>
-                <Meme></Meme>
+                {/*<Meme></Meme>*/}
                 <CaptionList></CaptionList>          
             </Row>
         </div>
@@ -18,12 +21,21 @@ function RoundLayout(props) {
 }
 
 function CaptionList(){
+    const [captions, setCaptions] = useState([]);
+
+    //There will be double GET, that because we are in strict mode and using useEffect with API, double effect! https://stackoverflow.com/questions/72238175/why-useeffect-running-twice-and-how-to-handle-it-well-in-react
+    useEffect( () => {
+        API.getCaptions()
+            .then( (caps) => setCaptions(caps))
+            .catch( (err) => console.log(err));
+    }, []);
+
     return (
         <Col>
             <ListGroup>
-                {props.captions.map( (caption) => <Caption 
-                    key={caption.id} 
-                    caption={caption}
+                {captions.map( (caption) => <Caption 
+                    id={caption.id} 
+                    description={caption.description}
                 />)}
             </ListGroup>
         </Col>
@@ -31,9 +43,10 @@ function CaptionList(){
 }
 
 function Caption(props){
+
     return (
         <ListGroupItem eventKey={props.id}>
-            {props.caption.text}
+            {props.description}
         </ListGroupItem>
     )
 }
@@ -76,13 +89,12 @@ function Home(props) {
         <Row><h3>Exclusive content if you are logged in!</h3></Row>
         <Row>
             <Col>< ListGroup>
-                <ListGroup.Item>1. There will be a Meme and 7 captions!</ListGroup.Item>
-                <ListGroup.Item>2. You must choose the best captions for the meme!</ListGroup.Item>
-                <ListGroup.Item>3. You have 30 seconds to decide, otherwise no points!</ListGroup.Item>
+                <ListGroup.Item>1. You can retrieve all your pasts games!!</ListGroup.Item>
+                <ListGroup.Item>2. See the global ranking of other user, try to beat them!</ListGroup.Item>
             </ListGroup></Col>
         </Row>
         </>
     );
 };
 
-export { NotFoundLayout, Home}
+export { NotFoundLayout, Home, CaptionList, RoundLayout}

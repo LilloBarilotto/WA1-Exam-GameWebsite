@@ -1,19 +1,16 @@
 // imports
 import express from 'express';
 import morgan from 'morgan';
-import session from 'express-session';
 import cors from 'cors';
-
-import { body, validationResult, check } from 'express-validator';
 
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
+import session from 'express-session';
 
-import UserDAO from './dao/user-dao.mjs';
-import MemeDAO from './dao/meme-dao.mjs';
-import RoundDAO from './dao/round-dao.mjs';
-import CaptionDAO from './dao/caption-dao.mjs';
-
+import UserDAO from './user-dao.mjs';
+import MemeDAO from './meme-dao.mjs';
+import RoundDAO from './round-dao.mjs';
+import CaptionDAO from './caption-dao.mjs';
 
 const userDAO = new UserDAO();
 const memeDAO = new MemeDAO();
@@ -22,7 +19,6 @@ const captionDAO = new CaptionDAO();
 
 // init express and Dao modules
 const app = express();
-const port = 3001;
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -34,30 +30,23 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 /** Initialize and configure passport */
-passport.use(new LocalStrategy(async function verify(email, password, callback) {
-  const user = await userDAO.getUser(email, password);
+passport.use(new LocalStrategy(async function verify(username, password, callback) {
+  const user = await userDAO.getUser(username, password);
     if (!user)
-      return callback(null, false, 'Incorrect email and/or password.');
+      return callback(null, false, 'Incorrect username and/or password.');
     return callback(null, user);
 }));
 
-/** serialize and de-serialize the user (user object <-> session)
- *  we serialize the user id and we store it in the session: the session is very small in this way
- */
-passport.serializeUser((user, done) => {
-  done(null, user.id);
+/** serialize and de-serialize the user (user object <-> session)*/
+passport.serializeUser(function (user, callback) {
+  callback(null, user);
 });
 
 // starting from the data in the session, we extract the current (logged-in) user
 // This is so powerful because now we can access data stored in the db for the current user, simply writing req.user
 // I have to write another api to make frontend able to user the same information: this api is app.get('/api/sessions/current')
-passport.deserializeUser((id, done) => {
-  userDao.getUserById(id)
-    .then(user => {
-      done(null, user); // this will be available in req.user
-    }).catch(err => {
-      done(err, null);
-    });
+passport.deserializeUser((user, callback) => {
+  return callback(null, user);
 });
 
 // initialize and configure HTTP sessions
@@ -70,13 +59,10 @@ app.use(passport.authenticate('session'));
 
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated())
-    // SE SONO AUTENTICATO POSSO PROCEDERE A CHIAMARE LA FUNZIONE CHE SEGUE, CHE SARA' IL CORPO DELLE RICHIESTE GET/POST
     return next();
-  // altrimenti ritorno l'errore e non proseguo al prossimo middleware
-  return res.status(401).json({ error: 'not authenticated' });
+
+  return res.status(401).json({ error: 'Not authorized' });
 }
-
-
 
 
 
@@ -87,9 +73,7 @@ app.post('/api/sessions', function (req, res, next) {
     if (err)
       return next(err);
     if (!user) {
-      // display wrong login messages
-      console.log(user)
-      return res.status(401).json(info);
+      return res.status(401).json({error : info});
     }
     // success, perform the login
     req.login(user, (err) => {
@@ -105,8 +89,9 @@ app.post('/api/sessions', function (req, res, next) {
 
 // logout
 app.delete('/api/sessions/current', isLoggedIn, (req, res) => {
-  req.logout();
-  res.end();
+  req.logout(() => {
+    res.end();
+  });
 });
 
 // GET /sessions/current
@@ -115,20 +100,20 @@ app.get('/api/sessions/current', (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json(req.user);
   }
-  else
+  else  
     res.status(401).json({ error: 'Unauthenticated user!' });
 }); 
 
 
 /************************************* MEME'S API ****************************************/
 app.get('/api/memes', (req, res) => {
-  memeDao.getMemes()
+  memeDAO.getMemes()
     .then(memes => res.json(memes))
     .catch(() => res.status(500).end());
 });
 
 app.get('/api/memes/:id', (req, res) => {
-  memeDao.getMeme(req.params.id)
+  memeDAO.getMeme(req.params.id)
     .then(meme => {
       if (meme)
         res.json(meme);
@@ -141,21 +126,21 @@ app.get('/api/memes/:id', (req, res) => {
 
 /************************************* GAME'S API ****************************************/
 app.get('/api/games', isLoggedIn, (req, res) => {
-  gameDao.getGames(req.user.id)
+  gameDAO.getGames(req.user.id)
     .then(games => res.json(games))
     .catch(() => res.status(500).end());  
 });
 
 //TODO gestione body e salvataggio dei round
 app.post('/api/games', isLoggedIn, (req, res) => {
-  gameDao.createGame(req.user.id)
+  gameDAO.createGame(req.user.id)
     .then(game =>{
       let rounds = req.body.rounds.map(round => ({...round, game_ID: game.id}));
       
-      Promise.all(rounds.map(round => gameDao.addRound(round)))
+      Promise.all(rounds.map(round => gameDAO.addRound(round)))
         .then(() => res.status(201).json(game))
         .catch(() => {
-          gameDao.deleteGame(game.id);  // Add DELETE ON CASCADE to the 'rounds' table in the db
+          gameDAO.deleteGame(game.id);  // Add DELETE ON CASCADE to the 'rounds' table in the db
           res.status(500).end();
         })
     .catch(() => res.status(500).end());
@@ -164,7 +149,7 @@ app.post('/api/games', isLoggedIn, (req, res) => {
 
 //aggiungere controllo per vedere se l'utente ha richiesto un suo game e non di altri utenti
 app.get('/api/games/:id', isLoggedIn, (req, res) => {
-  gameDao.getGame(req.params.id)
+  gameDAO.getGame(req.params.id)
     .then(game => {
       if (game)
         res.json(game);
@@ -175,33 +160,33 @@ app.get('/api/games/:id', isLoggedIn, (req, res) => {
 });
 
 app.get('/api/rounds/:id', isLoggedIn, (req, res) => {
-  gameDao.getRound(req.params.id)
+  gameDAO.getRound(req.params.id)
     .then(round => res.json(round))
     .catch(() => res.status(500).end());
 });
 
-app.get('api/rounds/', isLoggedIn, (req, res) => {
-  gameDao.getRounds(req.user.id)
+app.get('/api/rounds/', isLoggedIn, (req, res) => {
+  gameDAO.getRounds(req.user.id)
     .then(rounds => res.json(rounds))
     .catch(() => res.status(500).end());
 });
 
 
 /************************************* CAPTION'S API ****************************************/
-app.get('api/captions', (req, res) => {
-  captionDao.getCaptions()
+app.get('/api/captions', (req, res) => {
+  captionDAO.getCaptions()
     .then(captions => res.json(captions))
     .catch(() => res.status(500).end());
 });
 
-app.get('api/captions/best', (req, res) => {
-  captionDao.getBestCaption(req.body.memeId)
+app.get('/api/captions/best', (req, res) => {
+  captionDAO.getBestCaption(req.body.memeId)
     .then(captions => res.json(captions))
     .catch(() => res.status(500).end());
 });
 
-app.get('api/captions/random', (req, res) => {
-  captionDao.getCaptionsN(5)
+app.get('/api/captions/random', (req, res) => {
+  captionDAO.getCaptionsN(5)
     .then(captions => res.json(captions))
     .catch(() => res.status(500).end());
 });
@@ -209,6 +194,7 @@ app.get('api/captions/random', (req, res) => {
 
 
 /************************************* Activate the server ****************************************/
+const port=3001;
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });

@@ -64,41 +64,30 @@ async function getRounds(id) {
 
 /*********************************** USER'S API *********************************************/
 async function login(credentials) {
-    const response = await fetch(SERVER_URL + '/sessions', {
+    return await fetch(SERVER_URL + '/sessions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({credentials}),
-    });
-    
-    if (!response.ok) {
-        throw new Error('Failed to login');
-    }
-    
-    return response.json();
+        body: JSON.stringify(credentials),
+    }).then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 async function logout() {
-    const response = await fetch(SERVER_URL + '/sessions/current', {
+    return await fetch(SERVER_URL + '/sessions/current', {
         method: 'DELETE',
-    });
-    
-    if (!response.ok) {
-        throw new Error('Failed to logout');
-    }
+        credentials: 'include',
+    }).then(handleInvalidResponse);
 }
 
 async function getCurrentUser() {
-    const response = await fetch(SERVER_URL + '/sessions/current');
-    
-    if (!response.ok) {
-        throw new Error('Failed to get current user');
-    }
-    
-    return response.json();
-}
+    return await fetch(SERVER_URL + '/sessions/current', {
+        credentials: 'include'
+    }).then(handleInvalidResponse)
+    .then(response => response.json());
+};
 
 async function getUsers() {
     const response = await fetch(SERVER_URL + '/users');
@@ -118,7 +107,7 @@ async function getCaptions() {
         throw new Error('Failed to fetch captions');
     }
     
-    return response.json();
+    return await response.json();
 }
 
 async function getCaption(id) {
@@ -139,6 +128,15 @@ async function getBestCaption(id) {
     }
     
     return response.json();
+}
+
+function handleInvalidResponse(response) {
+    if (!response.ok) { throw Error(response.statusText) }
+    let type = response.headers.get('Content-Type');
+    if (type !== null && type.indexOf('application/json') === -1){
+        throw new TypeError(`Expected JSON, got ${type}`)
+    }
+    return response;
 }
 
 

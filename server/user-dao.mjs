@@ -11,7 +11,7 @@ export default function UserDAO (){
                 if (err) {
                     reject(err);
                 } else {
-                    const users = rows.map(user => ({ id: user.id, username: user.username, email: user.email , point: user.point}));
+                    const users = rows.map(user => ({ id: user.id, nickname: user.nickname , point: user.point}));
                     resolve(users);
                 }
             });
@@ -20,22 +20,23 @@ export default function UserDAO (){
 
     this.getUserById = (id) => {
         return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM users WHERE user_id = ?', [id], (err, row) => {
+            db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const user = { id: row.id, username: row.username, email: row.email , point: row.point};
+                    const user = { id: row.id, username: row.username, nickname: row.nickname , point: row.point};
                     resolve(user);
                 }
             });
         });
     };
 
-    this.getUser = (email, password) => {
+    this.getUser = (username, password) => {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM users WHERE email=?';
-            db.get(sql, [email], (err, row) => {
+            const sql = 'SELECT * FROM users WHERE username=?';
+            db.get(sql, [username], (err, row) => {
                 if (err) {
+                    console.error("User not found ERR")
                     reject(err);
                 } else if (row === undefined) {
                     resolve(false);
@@ -46,7 +47,7 @@ export default function UserDAO (){
                         if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
                             resolve(false);
                         else{
-                            const user = { id: row.id, username: row.username, email: row.email , point: row.point};
+                            const user = { id: row.id, username: row.username, nickname: row.nickname , point: row.point};
                             resolve(user);
                         }
                     });

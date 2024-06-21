@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 
 function LoginForm(props) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const [show, setShow] = useState(false);
@@ -15,7 +15,7 @@ function LoginForm(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const credentials = { email, password };
+    const credentials = { username, password };
 
     props.handleLogin(credentials)
       .then ( () => navigate( "/" ) )
@@ -40,12 +40,12 @@ function LoginForm(props) {
                 variant="danger">
                 {errorMessage}
           </Alert>
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Label>email</Form.Label>
+          <Form.Group className="mb-3" controlId="username">
+            <Form.Label>username</Form.Label>
             <Form.Control
               type="email"
-              value={email} placeholder="Example: john.doe@polito.it"
-              onChange={(ev) => setEmail(ev.target.value)}
+              value={username} placeholder="Example: john.doe@polito.it"
+              onChange={(ev) => setUsername(ev.target.value)}
               required={true} 
             />
           </Form.Group>
