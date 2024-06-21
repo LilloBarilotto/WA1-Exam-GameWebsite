@@ -123,6 +123,12 @@ app.get('/api/memes/:id', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+app.get('/api/memes/random', (req, res) => {
+  memeDAO.getRandomMeme(req.body.roundIds)
+    .then(meme => res.json(meme))
+    .catch(() => res.status(500).end());
+}
+
 
 /************************************* GAME'S API ****************************************/
 app.get('/api/games', isLoggedIn, (req, res) => {

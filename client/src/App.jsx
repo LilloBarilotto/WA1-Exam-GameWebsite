@@ -18,7 +18,12 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [feedback, setFeedback] = useState(null);
-  const [count, setCount] = useState(0);
+
+
+  const [rounds, setRounds] = useState([]);  // array of completed rounds
+  const [anonymousGame, setAnonymousGame] = useState(false);
+  const [game, setGame] = useState(null);
+  const [meme, setMeme] = useState(null);
 
   const setFeedbackFromError = (err) => {
     let message = '';
@@ -26,8 +31,6 @@ function App() {
     else message = "Unknown Error";
     setFeedback(message); // Assuming only one error message at a time
   };
-
-const [shouldRefresh, setShouldRefresh] = useState(true);
 
   const handleLogin = async (credentials) => {
     API.login(credentials)
@@ -50,11 +53,36 @@ const [shouldRefresh, setShouldRefresh] = useState(true);
       .catch(err => {
         setFeedback(err.message);
       });
-  };
+  };  
 
-  const handleEndTimer = async () => {
-    setCount( count => count + 1);
+  const handleEndRound = async (round) => { // When the timer ends, the round is completed
+
+    let new_round = {
+      meme_ID : meme.id,
+      first_best_caption_ID : round.first_best_caption_ID,
+      second_best_caption_ID : round.second_best_caption_ID,
+      selected_caption_ID : round.selected_caption_ID ? round.selected_caption_ID : null,
+    }
+
+    setRounds([...rounds, new_round]);
   }
+
+  useEffect (() => { // When the rounds array is updated, the game is completed
+    if(rounds.length == 0) return;
+    
+    if(rounds.lenght== 1 && anonymousGame){
+      // render the result! -> GameLayout or RoundLayout?
+    }else if (rounds.length === 3 && !anonymousGame && loggedIn){
+      // send the info tho SERVER
+      // navigate to the result page!
+
+
+    } else{
+      // You have other round to play!
+    }
+
+  }, [rounds]);
+
 
   // every useEffect has 2 calls because of the strict mode (Trust completely stackoverflow)
   useEffect(() => {
@@ -77,23 +105,21 @@ const [shouldRefresh, setShouldRefresh] = useState(true);
           <Route path="/" element={<Home loggedIn={loggedIn} />} />
           <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback}/>} />
           <Route path="/captions" element={<CaptionList/>}/>
-          <Route path="/round" element={<RoundLayout count={count} setCount={setCount}/>}/>
+          <Route path="/play" element={<RoundLayout count={rounds.length} handleEndRound={handleEndRound} />}/>
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
         <Toast
-                        show={feedback !== ''}
-                        autohide
-                        onClose={() => setFeedback('')}
-                        delay={4000}
-                        position="top-end"
-                        className="position-fixed end-0 m-3"
-                    >
-                        <ToastBody>
-                            {feedback}
-                        </ToastBody>
-                    </Toast>
-
-      <Timer seconds={30} handleEndTimer={handleEndTimer}/>
+          show={feedback !== ''}
+          autohide
+          onClose={() => setFeedback('')}
+          delay={4000}
+          position="top-end"
+          className="position-fixed end-0 m-3"
+        >
+          <ToastBody>
+            {feedback}
+          </ToastBody>
+        </Toast>
       </Container>
     </div>
   );

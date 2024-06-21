@@ -11,7 +11,7 @@ export default function UserDAO (){
                 if (err) {
                     reject(err);
                 } else {
-                    const users = rows.map(user => ({ id: user.id, nickname: user.nickname , point: user.point}));
+                    const users = rows.map(user => ({ id: user.id, nickname: user.nickname , point: user.point})); // No email I want only info for the leaderboard
                     resolve(users);
                 }
             });

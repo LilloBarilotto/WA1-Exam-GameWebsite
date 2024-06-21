@@ -4,19 +4,6 @@ import db from './db.mjs';
 
 export default function CaptionDAO() {
 
-    this.getCaptions = () => {
-        console.log("ARRIVATA RICHIESTA")
-        return new Promise((resolve, reject) => {
-            db.all('SELECT * FROM captions', (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
-        });
-    };
-
     //** Return N random captions (usually 5) */
     this.getCaptionsN = (n) => {
         return new Promise((resolve, reject) => {

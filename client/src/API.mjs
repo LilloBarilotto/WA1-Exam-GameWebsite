@@ -1,54 +1,40 @@
 const SERVER_URL = 'http://localhost:3001/api';
 /*********************************** MEME'S API *********************************************/
 async function getMemes() {
-  const response = await fetch(SERVER_URL + '/memes');
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch memes');
-  }
-  
-  return response.json();
+  return await fetch(SERVER_URL + '/memes')
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 async function getMeme(id) {
-    const response = await fetch(SERVER_URL + `/memes/${id}`);
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch meme with id ' + id);
-    }
-    
-    return response.json();
+    return await fetch(SERVER_URL + `/memes/${id}`)
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
+
+async function getRandomMeme() {
+    return await fetch(SERVER_URL + '/memes/random')
+    .then(handleInvalidResponse)
+    .then(response => response.json());
+};
 
 /*********************************** GAME'S API *********************************************/
 async function getGames() {
-    const response = await fetch(SERVER_URL + '/games');
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch games');
-    }
-    
-    return response.json();
+    return await fetch(SERVER_URL + '/games')
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 async function getGame(id) {
-    const response = await fetch(SERVER_URL + `/games/${id}`);
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch game with id ' + id);
-    }
-    
-    return response.json();
+    return await fetch(SERVER_URL + `/games/${id}`)
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 async function getRound(id) {
-    const response = await fetch(SERVER_URL + `/rounds/${id}`);
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch round with id ' + id);
-    }
-    
-    return response.json();
+    return  fetch(SERVER_URL + `/rounds/${id}`)
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 //TODO non esiste attualmente questa API
@@ -90,26 +76,12 @@ async function getCurrentUser() {
 };
 
 async function getUsers() {
-    const response = await fetch(SERVER_URL + '/users');
-    
-    if (!response.ok) {
-        throw new Error('Failed to get users and their ranking');
-    }
-    
-    return response.json();
+    return await fetch(SERVER_URL + '/users')
+    .then(handleInvalidResponse)
+    .then(response => response.json());
 }
 
 /*********************************** CAPTION'S API*********************************************/
-async function getCaptions() {
-    const response = await fetch(SERVER_URL + '/captions');
-    
-    if (!response.ok) {
-        throw new Error('Failed to fetch captions');
-    }
-    
-    return await response.json();
-}
-
 async function getCaption(id) {
     const response = await fetch(SERVER_URL + `/captions/${id}`);
     
@@ -141,14 +113,14 @@ function handleInvalidResponse(response) {
 
 
 const API = {
-  getMemes,
-  getMeme,
-  getGames,
   login,
   logout,
   getCurrentUser,
+  
+  getMemes,
+  getMeme,
+  getGames,
   getUsers,
-  getCaptions,
   getCaption,
 };
 

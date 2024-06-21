@@ -54,7 +54,7 @@ export default function RoundDAO() {
 
     this.addGames = (game) => {
         return new Promise((resolve, reject) => {
-            db.run('INSERT INTO games (user_ID, meme_ID, date) VALUES (?, ?)', [game.user_ID, game.meme_ID, game.date], function(err) {
+            db.run('INSERT INTO games (user_ID, date) VALUES (?, ?)', [game.user_ID, game.date], function(err) {
                 if (err) {
                     reject(err);
                 } else {

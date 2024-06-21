@@ -4,22 +4,6 @@ import { Link } from "react-router-dom";
 
 import API from "../API";
 
-function RoundLayout(props) {
-    return (
-        <div className="container">
-            <Row>
-                <Col>
-                    <h2>Round {props.count+1}</h2>
-                </Col>
-            </Row>
-            <Row>
-                {/*<Meme></Meme>*/}
-                <CaptionList></CaptionList>          
-            </Row>
-        </div>
-    );
-}
-
 function CaptionList(){
     const [captions, setCaptions] = useState([]);
 
@@ -97,4 +81,4 @@ function Home(props) {
     );
 };
 
-export { NotFoundLayout, Home, CaptionList, RoundLayout}
+export { NotFoundLayout, Home, CaptionList}
