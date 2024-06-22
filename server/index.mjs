@@ -9,13 +9,15 @@ import session from 'express-session';
 
 import UserDAO from './user-dao.mjs';
 import MemeDAO from './meme-dao.mjs';
-import RoundDAO from './round-dao.mjs';
 import CaptionDAO from './caption-dao.mjs';
+import GameDAO from './game-dao.mjs';
+
+import dayjs from 'dayjs';
 
 const userDAO = new UserDAO();
 const memeDAO = new MemeDAO();
-const gameDAO = new RoundDAO();
 const captionDAO = new CaptionDAO();
+const gameDAO = new GameDAO();
 
 // init express and Dao modules
 const app = express();
@@ -106,29 +108,32 @@ app.get('/api/sessions/current', (req, res) => {
 
 
 /************************************* MEME'S API ****************************************/
-app.get('/api/memes', (req, res) => {
-  memeDAO.getMemes()
-    .then(memes => res.json(memes))
-    .catch(() => res.status(500).end());
+app.get('/api/memes/random', async (req, res) => {
+  try {
+    const meme = await memeDAO.getRandMeme(req.body.ids);
+    const bestcaptions = await captionDAO.getBestCaption(meme.id);
+    const randomCaptions = await captionDAO.getRandomCaptions(meme.id);
+
+    // Combine captions and randomCaptions
+    const allCaptions = [...bestcaptions, ...randomCaptions];
+
+    // Shuffle the combined array
+    for (let i = allCaptions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allCaptions[i], allCaptions[j]] = [allCaptions[j], allCaptions[i]];
+    }
+
+    const response = {
+      id: meme.id,
+      path_img: meme.path_img,
+      captions: allCaptions
+    };
+
+    res.json(response);
+  } catch (error) {
+    res.status(500).end();
+  }
 });
-
-app.get('/api/memes/:id', (req, res) => {
-  memeDAO.getMeme(req.params.id)
-    .then(meme => {
-      if (meme)
-        res.json(meme);
-      else
-        res.status(404).end();
-    })
-    .catch(() => res.status(500).end());
-});
-
-app.get('/api/memes/random', (req, res) => {
-  memeDAO.getRandomMeme(req.body.roundIds)
-    .then(meme => res.json(meme))
-    .catch(() => res.status(500).end());
-}
-
 
 /************************************* GAME'S API ****************************************/
 app.get('/api/games', isLoggedIn, (req, res) => {
@@ -138,63 +143,76 @@ app.get('/api/games', isLoggedIn, (req, res) => {
 });
 
 //TODO gestione body e salvataggio dei round
-app.post('/api/games', isLoggedIn, (req, res) => {
-  gameDAO.createGame(req.user.id)
-    .then(game =>{
-      let rounds = req.body.rounds.map(round => ({...round, game_ID: game.id}));
-      
-      Promise.all(rounds.map(round => gameDAO.addRound(round)))
-        .then(() => res.status(201).json(game))
-        .catch(() => {
-          gameDAO.deleteGame(game.id);  // Add DELETE ON CASCADE to the 'rounds' table in the db
-          res.status(500).end();
-        })
-    .catch(() => res.status(500).end());
-    });
+app.post('/api/games', isLoggedIn, async (req, res) => {
+
+    try{
+
+      // Define if the round are with correct caption and calculate the points
+      let temp_rounds = req.body.rounds.map(round => ({
+        ...round,
+        point : ( round.selected_caption_id && captionDAO.isBestCaption(round.meme_id, round.selected_caption_id)) ? 5 : 0
+      }));
+
+      // try to add the game and the rounds
+      let game = {
+        date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        user_id: req.user.id,
+        total_points: temp_rounds.reduce((acc, round) => acc + round.point, 0)
+      };
+
+      const game_id = await gameDAO.addGame(game);
+      rounds = rounds.map(round => ({...round, game_id : game_id}));
+
+      await Promise.all(temp_rounds.map(round => gameDAO.addRound(round)));
+
+      game = {
+        ...game,
+        id: game_id,
+        rounds: temp_rounds};
+
+      res.status(201).json(game);
+
+    }catch(error){
+      if (game_id)
+        gameDAO.deleteGame(game_id);
+      res.status(500).end();
+    }
 });
 
-//aggiungere controllo per vedere se l'utente ha richiesto un suo game e non di altri utenti
-app.get('/api/games/:id', isLoggedIn, (req, res) => {
-  gameDAO.getGame(req.params.id)
-    .then(game => {
-      if (game)
-        res.json(game);
-      else
-        res.status(404).end();
-    })
-    .catch(() => res.status(500).end());
-});
+app.get('/api/games/:id', isLoggedIn, async (req, res) => {
+  try{
+    const game = await gameDAO.getGame(req.params.id);
+    if(game.user_id != req.user.id)
+      res.status(401).end();
 
-app.get('/api/rounds/:id', isLoggedIn, (req, res) => {
-  gameDAO.getRound(req.params.id)
-    .then(round => res.json(round))
-    .catch(() => res.status(500).end());
-});
+    const temp_rounds = await gameDAO.getRounds(req.params.id);
 
-app.get('/api/rounds/', isLoggedIn, (req, res) => {
-  gameDAO.getRounds(req.user.id)
-    .then(rounds => res.json(rounds))
-    .catch(() => res.status(500).end());
-});
+    // CREATE A FUNCTION TO DO THAT
+    const rounds = await Promise.all(temp_rounds.map(async round => {
+      const meme = await memeDAO.getMeme(round.meme_id);
+      const first_best_caption = await captionDAO.getCaption(round.first_best_caption_id);
+      const second_best_caption = await captionDAO.getCaption(round.second_best_caption_id);
+      const selected_caption = await captionDAO.getCaption(round.selected_caption_id) || null;
+      return {
+        ...round,
+        meme: meme,
+        captions: {
+          first_best_caption: first_best_caption,
+          second_best_caption: second_best_caption,
+          selected_caption: selected_caption
+        }
+      };
+    }));
 
+    response = {
+      ...game,
+      rounds: rounds
+    }
 
-/************************************* CAPTION'S API ****************************************/
-app.get('/api/captions', (req, res) => {
-  captionDAO.getCaptions()
-    .then(captions => res.json(captions))
-    .catch(() => res.status(500).end());
-});
-
-app.get('/api/captions/best', (req, res) => {
-  captionDAO.getBestCaption(req.body.memeId)
-    .then(captions => res.json(captions))
-    .catch(() => res.status(500).end());
-});
-
-app.get('/api/captions/random', (req, res) => {
-  captionDAO.getCaptionsN(5)
-    .then(captions => res.json(captions))
-    .catch(() => res.status(500).end());
+  }
+  catch(error){
+    res.status(500).end();
+  }
 });
 
 

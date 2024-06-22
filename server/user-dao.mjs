@@ -7,12 +7,11 @@ export default function UserDAO (){
 
     this.getUsers = () => {
         return new Promise((resolve, reject) => {
-            db.all('SELECT * FROM users', (err, rows) => {
+            db.all('SELECT nickname, total_point FROM users', (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const users = rows.map(user => ({ id: user.id, nickname: user.nickname , point: user.point})); // No email I want only info for the leaderboard
-                    resolve(users);
+                    resolve(rows);
                 }
             });
         });
@@ -20,12 +19,11 @@ export default function UserDAO (){
 
     this.getUserById = (id) => {
         return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+            db.get('SELECT id, username, nickname, total_point FROM users WHERE id = ?', [id], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const user = { id: row.id, username: row.username, nickname: row.nickname , point: row.point};
-                    resolve(user);
+                    resolve(row);
                 }
             });
         });
@@ -47,7 +45,7 @@ export default function UserDAO (){
                         if (!crypto.timingSafeEqual(Buffer.from(row.hash, 'hex'), hashedPassword))
                             resolve(false);
                         else{
-                            const user = { id: row.id, username: row.username, nickname: row.nickname , point: row.point};
+                            const user = { id: row.id, username: row.username, nickname: row.nickname , total_point: row.total_point};
                             resolve(user);
                         }
                     });
