@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 const MemeCard = ({ id, path_img }) => {
   return (
-    <Card className="MemeCard">
+    <Card className="MemeCard" style={{ width: '25rem' }}>
       <Card.Img variant="top" src={path_img} alt={`Meme ${id}`} className="MemeImage" />
     </Card>
   );

@@ -46,6 +46,7 @@ function NotFoundLayout() {
 }
 
 function Home(props) {
+
     return (
         <>
         <Row className="mx-auto">
@@ -54,7 +55,7 @@ function Home(props) {
             </Col>
         </Row>
         <Row className="mx-auto">
-            <Col> <Button>Start Anonymous Round </Button></Col>
+            <Col> <Button onClick={() => {props.setAnonymousGame(true); props.handleNewRound();}}>Start Anonymous Round </Button></Col>
             { props.loggedIn ? <Col><Button>Start entire Games (3 Round)</Button></Col> : null }
         </Row>
         <Row><h3>Here some rules:</h3></Row>

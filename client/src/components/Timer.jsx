@@ -19,7 +19,7 @@ const Timer = (props) => {
   
     return (
       <div>
-        <h1>{timeLeft}</h1>
+        <h2>{timeLeft}</h2>
       </div>
     );
 };

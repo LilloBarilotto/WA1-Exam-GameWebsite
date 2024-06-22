@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {Container, Toast, ToastBody} from 'react-bootstrap/';
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -8,22 +8,38 @@ import './App.css';
 
 import API from "./API.mjs";
 
-import { NotFoundLayout , Home, CaptionList, RoundLayout} from './components/PageLayout.jsx';
+import { NotFoundLayout , Home} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
-import GameNavBar from './components/Header.jsx';
-import { Timer } from './components/Game.jsx';
+import Header from './components/Header.jsx';
+import Timer  from './components/Timer.jsx';
+import Round from './components/RoundBoard.jsx';
 
 function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [feedback, setFeedback] = useState(null);
-
+  const navigate = useNavigate();
 
   const [rounds, setRounds] = useState([]);  // array of completed rounds
   const [anonymousGame, setAnonymousGame] = useState(false);
   const [game, setGame] = useState(null);
   const [meme, setMeme] = useState(null);
+  const [captions, setCaptions] = useState([]);
+  const [selectedCaption, setSelectedCaption] = useState(null);
+
+  const handleNewRound = () => {
+    API.getRandomMeme(rounds.map(round => round.meme_ID))
+    .then(res => {
+        setMeme({
+            id: res.id,
+            path_img: res.path_img
+        });
+        setCaptions([...res.captions]);
+
+        navigate('/play');
+    });
+  }
 
   const setFeedbackFromError = (err) => {
     let message = '';
@@ -55,30 +71,34 @@ function App() {
       });
   };  
 
-  const handleEndRound = async (round) => { // When the timer ends, the round is completed
+  const handleEndRound = async () => { // When the timer ends, the round is completed
 
-    let new_round = {
+    const round = {
       meme_ID : meme.id,
-      first_best_caption_ID : round.first_best_caption_ID,
-      second_best_caption_ID : round.second_best_caption_ID,
-      selected_caption_ID : round.selected_caption_ID ? round.selected_caption_ID : null,
+      captionsIds: captions.map(caption => caption.id),
+      selected_caption_ID : selectedCaption ? selectedCaption.id : null,
     }
 
-    setRounds([...rounds, new_round]);
+    setRounds([...rounds, round]);
   }
 
   useEffect (() => { // When the rounds array is updated, the game is completed
     if(rounds.length == 0) return;
-    
+        
     if(rounds.lenght== 1 && anonymousGame){
-      // render the result! -> GameLayout or RoundLayout?
+      API.getRoundResults(rounds[0])
+      .then(res => {
+        setGame(res);
+        navigate('/result'); 
+      })
     }else if (rounds.length === 3 && !anonymousGame && loggedIn){
-      // send the info tho SERVER
-      // navigate to the result page!
-
-
+      API.addGame(rounds)
+      .then(game => {
+        setGame(game);
+        navigate('/games/' + game.id);
+      })
     } else{
-      // You have other round to play!
+      navigate('/play')
     }
 
   }, [rounds]);
@@ -99,27 +119,34 @@ function App() {
 
   return (
     <div className="min-vh-100 d-flex flex-column">
-    <GameNavBar loggedIn={loggedIn} handleLogout={handleLogout}/>
+    <Header loggedIn={loggedIn} handleLogout={handleLogout}/>
+    <Toast
+      show={feedback !== ''}
+      autohide
+      onClose={() => setFeedback('')}
+      delay={4000}
+      position="top-end"
+      className="position-fixed end-0 m-3"
+    >
+      <ToastBody>{feedback}</ToastBody>
+    </Toast>
       <Container fluid className="flex-grow-1 d-flex flex-column">
         <Routes>
-          <Route path="/" element={<Home loggedIn={loggedIn} />} />
+          <Route path="/" element={<Home loggedIn={loggedIn} handleNewRound={handleNewRound}
+                setAnonymousGame={setAnonymousGame}    
+            />}
+          />
           <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback}/>} />
-          <Route path="/captions" element={<CaptionList/>}/>
-          <Route path="/play" element={<RoundLayout count={rounds.length} handleEndRound={handleEndRound} />}/>
+          <Route path="/play" element={<Round count={rounds.length} handleEndRound={handleEndRound}
+            meme={meme} captions={captions} selectedCaption={selectedCaption} setSelectedCaption={setSelectedCaption}
+            />}
+          />
+          { /** <Route path="/result" element={<NotFoundLayout/>}/> */}
+          { /** <Route path="/games/:id" element={<NotFoundLayout/>}/> */}
+          { /** <Route path="/games" element={<NotFoundLayout/>}/> */}
+          { /** <Route path="/leaderboard" element={<NotFoundLayout/>}/> */}
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
-        <Toast
-          show={feedback !== ''}
-          autohide
-          onClose={() => setFeedback('')}
-          delay={4000}
-          position="top-end"
-          className="position-fixed end-0 m-3"
-        >
-          <ToastBody>
-            {feedback}
-          </ToastBody>
-        </Toast>
       </Container>
     </div>
   );
