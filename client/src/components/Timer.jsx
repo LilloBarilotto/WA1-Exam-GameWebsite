@@ -28,3 +28,5 @@ Timer.propTypes = {
     handleEndTimer: PropTypes.func,
     seconds: PropTypes.number,
 }
+
+export default Timer;

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { Col, Container, Row } from "react-bootstrap";
 import { LoginButton, LogoutButton } from "./Auth";
 
-function GameNavBar(props) {
+function Header(props) {
     return <header className="py-1 py-md-3 border-bottom bg-primary">
         <Container fluid className="gap-3 align-items-center">
             <Row>
@@ -23,10 +23,10 @@ function GameNavBar(props) {
 }
 
 
-GameNavBar.propTypes = {
+Header.propTypes = {
     handleLogout: PropTypes.func,
     user: PropTypes.object,
     loggedIn: PropTypes.bool
 }
 
-export default GameNavBar;
+export default Header;

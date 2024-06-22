@@ -10,7 +10,7 @@ import API from "./API.mjs";
 
 import { NotFoundLayout , Home, CaptionList, RoundLayout} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
-import GameNavBar from './components/GameNavBar.jsx';
+import GameNavBar from './components/Header.jsx';
 import { Timer } from './components/Game.jsx';
 
 function App() {

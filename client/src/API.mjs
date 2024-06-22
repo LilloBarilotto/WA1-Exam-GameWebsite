@@ -7,6 +7,18 @@ async function getRandomMeme() {
 };
 
 /*********************************** GAME'S API *********************************************/
+async function addGame(game) {
+    return await fetch(SERVER_URL + '/games', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(game),
+    }).then(handleInvalidResponse)
+    .then(response => response.json());
+}
+
 async function getGames() {
     return await fetch(SERVER_URL + '/games')
     .then(handleInvalidResponse)
@@ -16,6 +28,17 @@ async function getGames() {
 async function getGame(id) {
     return await fetch(SERVER_URL + `/games/${id}`)
     .then(handleInvalidResponse)
+    .then(response => response.json());
+}
+
+async function getRoundResults(round) {
+    return await fetch(SERVER_URL + '/games/anonymous', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(round)
+    }).then(handleInvalidResponse)
     .then(response => response.json());
 }
 
@@ -68,10 +91,13 @@ const API = {
   login,
   logout,
   getCurrentUser,
+  getLeaderboard,
  
   getGames,
   getGame,
-  getLeaderboard,
+  addGame,
+
+  getRoundResults,
   getRandomMeme
 };
 
