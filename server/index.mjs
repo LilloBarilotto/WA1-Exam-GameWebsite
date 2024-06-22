@@ -107,28 +107,43 @@ app.get('/api/sessions/current', (req, res) => {
 }); 
 
 
+app.get('/api/users', (req, res) => {
+  userDAO.getUsers()
+    .then(users => res.json(users))
+    .catch(() => res.status(500).end());
+});
+
+
 /************************************* MEME'S API ****************************************/
 app.get('/api/memes/random', async (req, res) => {
   try {
-    const meme = await memeDAO.getRandMeme(req.body.ids);
-    const bestcaptions = await captionDAO.getBestCaption(meme.id);
-    const randomCaptions = await captionDAO.getRandomCaptions(meme.id);
 
+    const meme = await memeDAO.getRandMeme(req.body.ids || []);
+    console.log(meme);
+  
+    const bestcaptions = await captionDAO.getBestCaption(meme.id);
+    console.log(bestcaptions);    
+  
+    const randomCaptions = await captionDAO.getRandomCaptions(meme.id);
+    console.log(randomCaptions);
     // Combine captions and randomCaptions
     const allCaptions = [...bestcaptions, ...randomCaptions];
 
+    console.log(4);
     // Shuffle the combined array
     for (let i = allCaptions.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [allCaptions[i], allCaptions[j]] = [allCaptions[j], allCaptions[i]];
     }
 
+    console.log(5);
     const response = {
       id: meme.id,
       path_img: meme.path_img,
       captions: allCaptions
     };
 
+    console.log(6);
     res.json(response);
   } catch (error) {
     res.status(500).end();

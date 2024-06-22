@@ -71,6 +71,7 @@ const API = {
   getCurrentUser,
  
   getGames,
+  getGame,
   getLeaderboard,
   getRandomMeme
 };

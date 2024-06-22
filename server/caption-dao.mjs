@@ -19,7 +19,7 @@ export default function CaptionDAO() {
     /** Return two from the best caption for the meme!*/
     this.getBestCaption = (memeId) => {
         return new Promise((resolve, reject) => {
-            db.all('SELECT * FROM captions c, best_captions bc WHERE c.id= best_captions.caption_id AND bc.meme_id = ? ORDER BY RANDOM() LIMIT 2', [memeId], (err, rows) => {
+            db.all('SELECT c.id, c.description FROM captions c, best_captions bc WHERE c.id = bc.caption_id AND bc.meme_id = ? ORDER BY RANDOM() LIMIT 2', [memeId], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
