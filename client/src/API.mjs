@@ -19,7 +19,6 @@ async function getGame(id) {
     .then(response => response.json());
 }
 
-
 /*********************************** USER'S API *********************************************/
 async function login(credentials) {
     return await fetch(SERVER_URL + '/sessions', {

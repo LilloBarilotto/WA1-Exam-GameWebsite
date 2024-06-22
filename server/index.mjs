@@ -157,35 +157,61 @@ app.get('/api/games', isLoggedIn, (req, res) => {
     .catch(() => res.status(500).end());  
 });
 
+async function calculatePoint(round) {
+
+  try{
+  const meme = await memeDAO.getMeme(round.meme_id);
+  const roundBestCaptions = round.captionsIds.filter(captionId => captionDAO.isBestCaption(meme.id, captionId)). 
+    map(async (captionId) => await captionDAO.getCaption(captionId))
+  ;
+  
+  const selected_caption = await captionDAO.getCaption(round.selected_caption_id);
+  const point = (round.selected_caption_id && roundBestCaptions.some(caption => caption.id == selected_caption.id)) ? 5 : 0;
+
+  const response = {
+    point: point,
+    meme: meme,
+    captions: {
+      first_best_caption: roundBestCaptions[0],
+      second_best_caption: roundBestCaptions[1],
+      selected_caption: selected_caption
+    }
+  };
+
+  return response;
+  }
+  catch(error){
+    return 0;
+  }
+}
+
 //TODO gestione body e salvataggio dei round
 app.post('/api/games', isLoggedIn, async (req, res) => {
-
     try{
-
-      // Define if the round are with correct caption and calculate the points
-      let temp_rounds = req.body.rounds.map(round => ({
-        ...round,
-        point : ( round.selected_caption_id && captionDAO.isBestCaption(round.meme_id, round.selected_caption_id)) ? 5 : 0
-      }));
+      let rounds = req.body.rounds.map(round => calculatePoint(round));
 
       // try to add the game and the rounds
       let game = {
         date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         user_id: req.user.id,
-        total_points: temp_rounds.reduce((acc, round) => acc + round.point, 0)
+        total_points: rounds.reduce((acc, round) => acc + round.point, 0)
       };
 
       const game_id = await gameDAO.addGame(game);
       rounds = rounds.map(round => ({...round, game_id : game_id}));
-
-      await Promise.all(temp_rounds.map(round => gameDAO.addRound(round)));
-
-      game = {
-        ...game,
-        id: game_id,
-        rounds: temp_rounds};
-
-      res.status(201).json(game);
+      
+      await Promise.all(rounds.map(round =>
+        gameDAO.addRound({
+          meme_ID: round.meme.id,
+          first_best_caption_ID: round.captions.first_best_caption.id,
+          second_best_caption_ID: round.captions.second_best_caption.id,
+          selected_caption_ID: round.captions.selected_caption.id,
+          point: round.point,
+          game_ID: game_id
+        })
+      ));
+      
+      res.json({id: game_id})
 
     }catch(error){
       if (game_id)
@@ -209,7 +235,8 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
       const second_best_caption = await captionDAO.getCaption(round.second_best_caption_id);
       const selected_caption = await captionDAO.getCaption(round.selected_caption_id) || null;
       return {
-        ...round,
+        id: round.id,
+        point: round.point,
         meme: meme,
         captions: {
           first_best_caption: first_best_caption,
@@ -230,7 +257,14 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
   }
 });
 
+app.get('/api/games/anonymous', (req, res) => {
+  const response = calculatePoint(req.body.round);
 
+  if (response != 0)
+    res.json(response);
+  else
+    res.status(500).end();
+});
 
 /************************************* Activate the server ****************************************/
 const port=3001;

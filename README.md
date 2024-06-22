@@ -97,14 +97,12 @@
       "date" : "2024-06-28"
       "rounds" : [
         {
-          "first_best_caption_id": 1,
-          "second_best_caption_id": 2,
-          "selected_caption_id" : 2,
+          "captionIds": [1,2,3,4,5,6,7],
+          "selected_caption_id" : 2,"
           "meme_id": 1,
         },
         {
-          "first_best_caption_id": 3,
-          "second_best_caption_id": 2,
+          "captionIds": [1,2,3,4,5,6,7],
           "selected_caption_id" : null,
           "meme_id": 2,
         },
@@ -113,8 +111,11 @@
     }
     ```
     - response code: `200`
-    - response body content: Array of 2 captions from best for specific meme
-    - error response code:  `401` if user not logged in, `422` if body content is not valid, `500` if an error occurred 
+    - response body content: The id of the game inserted.
+    - error response code:  `401` if user not logged in, `422` if body content is not valid, `500` if an error occurred
+    ```
+      {"id":  1}
+    ``` 
 - GET `/games`: Show history of all games by the logged user
     - request body: `None` 
     - response code: `200`
@@ -163,6 +164,36 @@
     }
     ```
 
+- POST `/games/anonymous`: Calculate info about one anonymous round, retrieve the rounde + the 2 best captions + point (5 or 0). 
+    - request body: Info about the single round, example below
+    ```
+    {
+      "captionIds": [1,2,3,4,5,6,7],
+      "selected_caption_id" : 2,"
+      "meme_id": 1,
+    }
+    ```
+    - response code: `200`
+    - response body content: More detailed info about the round, and the result point 
+    - error response code: ` `500` if there is an error
+    ```
+    {  
+          "id" : 1,
+          "point" : 5,
+          "meme":{
+            "id" : 1,
+            "path": "..."
+          },
+          captions:{
+            "first_best_caption" :{
+              "id" : 2,
+              "description": "..."
+            },
+            "second_best_caption": {...},
+            "selected_caption": {...}
+          }
+    }
+    ```
 ## Database Tables
 
 -  `users` - (id, username, email, password, salt, total_point)
