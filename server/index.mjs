@@ -115,7 +115,7 @@ app.get('/api/users', (req, res) => {
 
 
 /************************************* MEME'S API ****************************************/
-app.get('/api/memes/random', async (req, res) => {
+app.post('/api/memes/random', async (req, res) => {
   try {
 
     const meme = await memeDAO.getRandMeme(req.body.ids || []);
@@ -180,6 +180,36 @@ async function calculatePoint(round) {
   }
 }
 
+async function recreateRound(round){
+
+  try{
+  const meme = await memeDAO.getMeme(round.meme_ID);
+
+  const captions = [
+    await captionDAO.getCaption(round.first_best_caption_ID),
+    await captionDAO.getCaption(round.second_best_caption_ID),
+  ];
+
+  let selected_caption = {};
+  if(round.selected_caption_ID){
+    selected_caption = await captionDAO.getCaption(round.selected_caption_ID);
+  }
+  
+  const response = {
+    id: round.id,
+    point: round.point,
+    meme: meme,
+    bestCaptions: captions,
+    selectedCaption: selected_caption
+  };
+
+  return response;
+  }
+  catch(error){
+    return 0;
+  }
+}
+
 //TODO gestione body e salvataggio dei round
 app.post('/api/games', isLoggedIn, async (req, res) => {
     let game_ID = null;
@@ -225,35 +255,27 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
 
 app.get('/api/games/:id', isLoggedIn, async (req, res) => {
   try{
+
     const game = await gameDAO.getGame(req.params.id);
-    if(game.user_id != req.user.id)
+    if(game.user_ID != req.user.id)
       res.status(401).end();
 
     const temp_rounds = await gameDAO.getRounds(req.params.id);
 
-    // CREATE A FUNCTION TO DO THAT
-    const rounds = await Promise.all(temp_rounds.map(async round => {
-      const meme = await memeDAO.getMeme(round.meme_id);
-      const first_best_caption = await captionDAO.getCaption(round.first_best_caption_id);
-      const second_best_caption = await captionDAO.getCaption(round.second_best_caption_id);
-      const selected_caption = await captionDAO.getCaption(round.selected_caption_id) || null;
-      return {
-        id: round.id,
-        point: round.point,
-        meme: meme,
-        captions: {
-          first_best_caption: first_best_caption,
-          second_best_caption: second_best_caption,
-          selected_caption: selected_caption
-        }
-      };
-    }));
+    const rounds = [
+      await recreateRound(temp_rounds[0]),
+      await recreateRound(temp_rounds[1]),
+      await recreateRound(temp_rounds[2])
+    ]
 
-    response = {
+    console.log(rounds);
+
+    const response = {
       ...game,
       rounds: rounds
     }
 
+    res.json(response);
   }
   catch(error){
     res.status(500).end();

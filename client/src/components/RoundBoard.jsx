@@ -1,18 +1,25 @@
 import { Container, Col, Row, Button, Form, Modal , CardGroup} from 'react-bootstrap';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams , useNavigate} from 'react-router-dom';
 
-import Timer from './Timer.jsx';
+
 import PropTypes from "prop-types";
-
+import Timer from './Timer.jsx';
 import MemeCard from './Meme.jsx';
 import CaptionCard from './Caption.jsx';
 
+import API from "../API.mjs";
+
 function Round(props){
 
-  
+    useEffect(() => {
+        if(props.selectedCaption && Object.keys(props.selectedCaption).length > 0){
+            props.handleEndRound();
+        }
+    }, [props.selectedCaption]);
+
     return (
-        <Container fluid className="flex-grow-1 d-flex flex-column">
+        <Container className="flex-grow-1 d-flex flex-column">
             <Row><h1>Round {props.count + 1 }</h1></Row>
             <Row className="mx-auto">
                 <Col>
@@ -28,7 +35,13 @@ function Round(props){
             <CardGroup>
                 {props.captions && props.captions.map((caption) => (
                     <Col key={caption.id} >
-                        <CaptionCard id={caption.id} description={caption.description} onClick={() => props.setSelectedCaption(caption)}/>
+                        <CaptionCard
+                            id={caption.id}
+                            description={caption.description}
+                            onClick={() => {
+                                props.setSelectedCaption(caption);
+                            }}
+                        />
                     </Col>
                 ))}
             </CardGroup>
@@ -48,10 +61,10 @@ Round.propTypes = {
 
 function RoundResult(props){
     return (
-        <Container fluid className="flex-grow-1 d-flex flex-column">
+        <Container  className="flex-grow-1 d-flex flex-column custom-container bg-light">
             <Row className="mx-auto">
                 <Col>
-                    <h3>You scored {props.point}</h3>
+                    <h3>You scored {props.point} point </h3>
                     {props.meme && < MemeCard id={props.meme.id} path_img={props.meme.path_img} />}
                 </Col>
 
@@ -76,24 +89,70 @@ function RoundResult(props){
     );
 };
 
-function GameResult(props){
+function GameResult(){
+    let { id } = useParams();
+    const [game, setGame] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        API.getGame(id)
+        .then(g => {
+            setGame(g);
+            setLoading(false);
+        })
+    }, [id]);
+
+    if(loading) return (<Container>Loading...</Container>); 
 
     return (
-        <Container fluid className="flex-grow-1 d-flex flex-column">
-            <Row className="mx-auto">
-                <Col>
-                    <h3>Game Over</h3>
-                    <h3>Your final score is {props.total_point} . Here the list of your rounds</h3>
+            <Container className="flex-grow-1 d-flex flex-column">
+            {game.id && <Row className="mx-auto">
+                <Col>   
+                    <h3>Your final score is {game.point} . Here the list of your rounds</h3>
                 </Col>
-            </Row>
-            {props.rounds && props.rounds.map((round) => (
+            </Row>}
+            {game.rounds && game.rounds.map((round) => (
                 <Row key={round.id} className="mx-auto">
-                    <RoundResult point={round.point} meme={round.meme} correctCaptions={round.correctCaptions}
-                      selectedCaption={round.selectedCaption ? round.selectedCaption : {"id": -1 , "description": "No caption selected"}} />
+                    <RoundResult point={round.point} meme={round.meme} correctCaptions={round.bestCaptions}
+                      selectedCaption={
+                        round.selectedCaption && Object.keys(round.selectedCaption).length > 0 
+                          ? round.selectedCaption 
+                          : { "id": -1, "description": "No caption selected" }
+                      } />
                 </Row>
             ))}
         </Container>
     );
 };
 
-export {Round, RoundResult, GameResult};
+
+function GamesResult(){
+    const [games, setGames] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        API.getGames()
+        .then(games => {
+            setGames(games);
+            setLoading(false);
+        })
+    }, []);
+
+    if(loading) return (<Container>Loading...</Container>);
+
+    return (
+        <Container>
+          {games.map((game) => (
+            <Row key={game.id} className="game-result">
+                <Col><p>Date: {game.date}</p></Col>
+                <Col><p>Score: {game.point}</p></Col>
+                <Col><Button onClick={() => navigate("/games/"+game.id)}>See Details</Button></Col>
+            </Row>
+          ))}
+        </Container>
+      );
+
+}
+
+export {Round, RoundResult, GameResult, GamesResult};

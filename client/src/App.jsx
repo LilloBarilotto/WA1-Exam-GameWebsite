@@ -14,7 +14,7 @@ import API from "./API.mjs";
 import { NotFoundLayout , Home} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
 import Header from './components/Header.jsx';
-import {Round, RoundResult, GameResult} from './components/RoundBoard.jsx';
+import {Round, RoundResult, GameResult, GamesResult} from './components/RoundBoard.jsx';
 
 function App() {
 
@@ -91,7 +91,7 @@ function App() {
         setFeedback(err.message);
       });
   };  
- 
+
   const handleEndRound = async () => { // When the timer ends, the round is completed
 
     const round = {
@@ -147,7 +147,8 @@ function App() {
   return (
     <div className="min-vh-100 d-flex flex-column">
     <Header loggedIn={loggedIn} handleLogout={handleLogout}/>
-    <Toast
+      <Container fluid className="flex-grow-1 d-flex flex-column">
+      <Toast
       show={feedback !== ''}
       autohide
       onClose={() => setFeedback('')}
@@ -157,7 +158,6 @@ function App() {
     >
       <ToastBody>{feedback}</ToastBody>
     </Toast>
-      <Container fluid className="flex-grow-1 d-flex flex-column">
         <Routes>
           <Route path="/" element={<Home loggedIn={loggedIn} handleNewRound={handleNewRound}
                 setAnonymousGame={setAnonymousGame}    
@@ -170,12 +170,12 @@ function App() {
             />}
           />
           {game && <Route path="/result" element={<RoundResult  point={game.point} meme={game.meme}
-            correctCaptions={game.bestCaptions} selectedCaption={selectedCaption ? selectedCaption : {"id": -1 , "description": "No caption selected"}}
+            correctCaptions={game.bestCaptions} selectedCaption={game.selectedCaption ? game.selectedCaption : {"id": -1 , "description": "No caption selected"}}
           />}
           />}
           { <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
-          { /** <Route path="/games" element={<NotFoundLayout/>}/> */}
-          { /** <Route path="/leaderboard" element={<NotFoundLayout/>}/> */}
+          { <Route path="/games" element={<GamesResult/>}/> }
+          { <Route path="/leaderboard" element={<NotFoundLayout/>} /> }
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
       </Container>

@@ -1,7 +1,14 @@
 const SERVER_URL = 'http://localhost:3001/api';
 /*********************************** MEME'S API *********************************************/
-async function getRandomMeme() {
-    return await fetch(SERVER_URL + '/memes/random')
+async function getRandomMeme(ids) {
+    return await fetch(SERVER_URL + '/memes/random',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(ids),
+    })
     .then(handleInvalidResponse)
     .then(response => response.json());
 };
@@ -20,13 +27,17 @@ async function addGame(game) {
 }
 
 async function getGames() {
-    return await fetch(SERVER_URL + '/games')
+    return await fetch(SERVER_URL + '/games', {
+        credentials: 'include'
+    })
     .then(handleInvalidResponse)
     .then(response => response.json());
 }
 
 async function getGame(id) {
-    return await fetch(SERVER_URL + `/games/${id}`)
+    return await fetch(SERVER_URL + `/games/${id}`,  {
+        credentials: 'include'
+    })
     .then(handleInvalidResponse)
     .then(response => response.json());
 }
