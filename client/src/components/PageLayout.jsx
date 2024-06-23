@@ -2,39 +2,6 @@ import { useEffect, useState } from "react";
 import {Row, Col, ListGroup, ListGroupItem, Button} from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-import API from "../API";
-
-function CaptionList(){
-    const [captions, setCaptions] = useState([]);
-
-    //There will be double GET, that because we are in strict mode and using useEffect with API, double effect! https://stackoverflow.com/questions/72238175/why-useeffect-running-twice-and-how-to-handle-it-well-in-react
-    useEffect( () => {
-        API.getCaptions()
-            .then( (caps) => setCaptions(caps))
-            .catch( (err) => console.log(err));
-    }, []);
-
-    return (
-        <Col>
-            <ListGroup>
-                {captions.map( (caption) => <Caption 
-                    id={caption.id} 
-                    description={caption.description}
-                />)}
-            </ListGroup>
-        </Col>
-    )
-}
-
-function Caption(props){
-
-    return (
-        <ListGroupItem eventKey={props.id}>
-            {props.description}
-        </ListGroupItem>
-    )
-}
-
 function NotFoundLayout() {
     return (
         <>
@@ -56,7 +23,7 @@ function Home(props) {
         </Row>
         <Row className="mx-auto">
             <Col> <Button onClick={() => {props.setAnonymousGame(true); props.handleNewRound();}}>Start Anonymous Round </Button></Col>
-            { props.loggedIn ? <Col><Button>Start entire Games (3 Round)</Button></Col> : null }
+            { props.loggedIn ? <Col><Button onClick={() => {props.setAnonymousGame(false); props.handleNewRound();}}>Start entire Games (3 Round)</Button></Col> : null }
         </Row>
         <Row><h3>Here some rules:</h3></Row>
         <Row>
@@ -82,4 +49,4 @@ function Home(props) {
     );
 };
 
-export { NotFoundLayout, Home, CaptionList}
+export { NotFoundLayout, Home}

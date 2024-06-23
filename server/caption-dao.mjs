@@ -16,6 +16,19 @@ export default function CaptionDAO() {
         });
     };
 
+
+    this.getAllBestCaptions = (memeId) => {
+        return new Promise((resolve, reject) => {
+            db.all('SELECT * FROM captions WHERE id IN (SELECT caption_id FROM best_captions WHERE meme_id = ?)', [memeId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
+
     /** Return two from the best caption for the meme!*/
     this.getBestCaption = (memeId) => {
         return new Promise((resolve, reject) => {
@@ -30,7 +43,7 @@ export default function CaptionDAO() {
     }
 
     this.isBestCaption = (memeId, captionId) => { 
-        return new Promise<Boolean>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             db.get('SELECT * FROM best_captions WHERE meme_id = ? AND caption_id = ?', [memeId, captionId], (err, row) => {
                 if (err) {
                     reject(err);

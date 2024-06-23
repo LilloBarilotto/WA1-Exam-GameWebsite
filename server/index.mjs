@@ -119,31 +119,25 @@ app.get('/api/memes/random', async (req, res) => {
   try {
 
     const meme = await memeDAO.getRandMeme(req.body.ids || []);
-    console.log(meme);
   
     const bestcaptions = await captionDAO.getBestCaption(meme.id);
-    console.log(bestcaptions);    
   
     const randomCaptions = await captionDAO.getRandomCaptions(meme.id);
-    console.log(randomCaptions);
     // Combine captions and randomCaptions
     const allCaptions = [...bestcaptions, ...randomCaptions];
 
-    console.log(4);
     // Shuffle the combined array
     for (let i = allCaptions.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [allCaptions[i], allCaptions[j]] = [allCaptions[j], allCaptions[i]];
     }
 
-    console.log(5);
     const response = {
       id: meme.id,
       path_img: meme.path_img,
       captions: allCaptions
     };
 
-    console.log(6);
     res.json(response);
   } catch (error) {
     res.status(500).end();
@@ -160,22 +154,23 @@ app.get('/api/games', isLoggedIn, (req, res) => {
 async function calculatePoint(round) {
 
   try{
-  const meme = await memeDAO.getMeme(round.meme_id);
-  const roundBestCaptions = round.captionsIds.filter(captionId => captionDAO.isBestCaption(meme.id, captionId)). 
-    map(async (captionId) => await captionDAO.getCaption(captionId))
-  ;
-  
-  const selected_caption = await captionDAO.getCaption(round.selected_caption_id);
-  const point = (round.selected_caption_id && roundBestCaptions.some(caption => caption.id == selected_caption.id)) ? 5 : 0;
+    
+  const meme = await memeDAO.getMeme(round.meme_ID);
+
+  const AllBestCaptions = await captionDAO.getAllBestCaptions(meme.id);
+  const roundBestCaptions = AllBestCaptions.filter( (caption) => round.captionsIds.includes(caption.id));
+
+  const selected_caption = await captionDAO.getCaption(round.selected_caption_ID);
+  const point = (selected_caption && roundBestCaptions.some(caption => caption.id == selected_caption.id)) ? 5 : 0;
 
   const response = {
     point: point,
     meme: meme,
-    captions: {
-      first_best_caption: roundBestCaptions[0],
-      second_best_caption: roundBestCaptions[1],
-      selected_caption: selected_caption
-    }
+    bestCaptions: [
+      roundBestCaptions[0],
+      roundBestCaptions[1]
+    ],
+    selectedCaption: selected_caption
   };
 
   return response;
@@ -187,35 +182,43 @@ async function calculatePoint(round) {
 
 //TODO gestione body e salvataggio dei round
 app.post('/api/games', isLoggedIn, async (req, res) => {
+    let game_ID = null;
     try{
-      let rounds = req.body.rounds.map(round => calculatePoint(round));
+      let tmp_rounds = req.body;
+      let rounds = [
+        await calculatePoint(tmp_rounds[0]),
+        await calculatePoint(tmp_rounds[1]),
+        await calculatePoint(tmp_rounds[2])
+      ];
 
       // try to add the game and the rounds
       let game = {
         date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        user_id: req.user.id,
-        total_points: rounds.reduce((acc, round) => acc + round.point, 0)
+        user_ID: req.user.id,
+        point: rounds.reduce((acc, round) => acc + round.point, 0)
       };
 
-      const game_id = await gameDAO.addGame(game);
-      rounds = rounds.map(round => ({...round, game_id : game_id}));
-      
+      game_ID = await gameDAO.addGame(game);
+      rounds = rounds.map( (round) => ({...round, game_ID : game_ID}) );
+
       await Promise.all(rounds.map(round =>
         gameDAO.addRound({
           meme_ID: round.meme.id,
-          first_best_caption_ID: round.captions.first_best_caption.id,
-          second_best_caption_ID: round.captions.second_best_caption.id,
-          selected_caption_ID: round.captions.selected_caption.id,
+          first_best_caption_ID: round.bestCaptions[0].id,
+          second_best_caption_ID: round.bestCaptions[1].id,
+          selected_caption_ID: round.selectedCaption ? round.selectedCaption.id : null,
           point: round.point,
-          game_ID: game_id
+          game_ID: game_ID
         })
       ));
-      
-      res.json({id: game_id})
+
+      res.json({id: game_ID})
 
     }catch(error){
-      if (game_id)
-        gameDAO.deleteGame(game_id);
+      console.log(error)
+      console.log(game_ID)
+      if (game_ID)
+        gameDAO.deleteGame(game_ID);
       res.status(500).end();
     }
 });
@@ -257,14 +260,17 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
   }
 });
 
-app.get('/api/games/anonymous', (req, res) => {
-  const response = calculatePoint(req.body.round);
+app.post('/api/games/anonymous', async (req, res) => {
+  try{
+    const round = req.body;
+    const response = await calculatePoint(round);
 
-  if (response != 0)
     res.json(response);
-  else
+  }catch(error){
     res.status(500).end();
+  };
 });
+
 
 /************************************* Activate the server ****************************************/
 const port=3001;

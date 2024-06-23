@@ -30,7 +30,7 @@ export default function GameDAO() {
 
     this.addRound = (round) => {
         return new Promise((resolve, reject) => {
-            db.run('INSERT INTO rounds (meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point, game_ID) VALUES (?, ?, ?, ?, ?, ?)', [round.meme_ID, round.first_best_caption_ID, round.second__best_caption_ID, round.selected_caption_ID, round.point, round.game_ID], function(err) {
+            db.run('INSERT INTO rounds (meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point, game_ID) VALUES (?, ?, ?, ?, ?, ?)', [round.meme_ID, round.first_best_caption_ID, round.second_best_caption_ID, round.selected_caption_ID, round.point, round.game_ID], function(err) {
                 if (err) {
                     reject(err);
                 } else {
@@ -42,7 +42,7 @@ export default function GameDAO() {
 
     this.addGame = (game) => {
         return new Promise((resolve, reject) => {
-            db.run('INSERT INTO games (user_ID, date) VALUES (?, ?)', [game.user_ID, game.date], function(err) {
+            db.run('INSERT INTO games (user_ID, date, point) VALUES (?, ?, ?)', [game.user_ID, game.date, game.point], function(err) {
                 if (err) {
                     reject(err);
                 } else {

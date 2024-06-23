@@ -4,15 +4,17 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import './App.css';
+import './styles/App.css';
+import './styles/Card.css';
+import './styles/Meme.css';
+
 
 import API from "./API.mjs";
 
 import { NotFoundLayout , Home} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
 import Header from './components/Header.jsx';
-import Timer  from './components/Timer.jsx';
-import Round from './components/RoundBoard.jsx';
+import {Round, RoundResult, GameResult} from './components/RoundBoard.jsx';
 
 function App() {
 
@@ -22,13 +24,31 @@ function App() {
   const navigate = useNavigate();
 
   const [rounds, setRounds] = useState([]);  // array of completed rounds
-  const [anonymousGame, setAnonymousGame] = useState(false);
-  const [game, setGame] = useState(null);
   const [meme, setMeme] = useState(null);
   const [captions, setCaptions] = useState([]);
   const [selectedCaption, setSelectedCaption] = useState(null);
 
+  const [anonymousGame, setAnonymousGame] = useState(false);
+  const [game, setGame] = useState(null);
+  const [seconds, setSeconds] = useState(0);
+
+   // every useEffect has 2 calls because of the strict mode (Trust completely stackoverflow)
+   useEffect(() => {
+    API.getCurrentUser()
+    .then(user => {
+      setLoggedIn(true);
+      setUser(user);  // here you have the user info, if already logged in
+    }).catch(e => {
+        if(loggedIn)    // printing error only if the state is inconsistent (i.e., the app was configured to be logged-in)
+            setFeedbackFromError(e);
+        setLoggedIn(false); setUser(null);
+    }); 
+  }, []);
+
   const handleNewRound = () => {
+    setSeconds(0);
+    setSelectedCaption(null);
+
     API.getRandomMeme(rounds.map(round => round.meme_ID))
     .then(res => {
         setMeme({
@@ -36,6 +56,7 @@ function App() {
             path_img: res.path_img
         });
         setCaptions([...res.captions]);
+        setSeconds(30);
 
         navigate('/play');
     });
@@ -70,7 +91,7 @@ function App() {
         setFeedback(err.message);
       });
   };  
-
+ 
   const handleEndRound = async () => { // When the timer ends, the round is completed
 
     const round = {
@@ -79,43 +100,49 @@ function App() {
       selected_caption_ID : selectedCaption ? selectedCaption.id : null,
     }
 
-    setRounds([...rounds, round]);
+    setRounds((rounds ) => [...rounds, round]);
   }
 
+  const handleGetGame = async (id) => {
+    API.getGame(id)
+    .then(game => {
+      setGame(game);
+    })
+    .catch(err => {
+      setFeedbackFromError(err);
+    });
+  };
+
   useEffect (() => { // When the rounds array is updated, the game is completed
-    if(rounds.length == 0) return;
+      
+    if(rounds.length === 0) return;
         
-    if(rounds.lenght== 1 && anonymousGame){
+    if(rounds.length === 1 && anonymousGame){
       API.getRoundResults(rounds[0])
       .then(res => {
         setGame(res);
+        setRounds([]);
+        setSelectedCaption(null);
+        setSeconds(0);
+
         navigate('/result'); 
       })
     }else if (rounds.length === 3 && !anonymousGame && loggedIn){
       API.addGame(rounds)
       .then(game => {
+        
         setGame(game);
+        setRounds([]);
+        setSelectedCaption(null);
+        setSeconds(0);
+
         navigate('/games/' + game.id);
       })
     } else{
-      navigate('/play')
+      handleNewRound();
     }
 
   }, [rounds]);
-
-
-  // every useEffect has 2 calls because of the strict mode (Trust completely stackoverflow)
-  useEffect(() => {
-    API.getCurrentUser()
-    .then(user => {
-      setLoggedIn(true);
-      setUser(user);  // here you have the user info, if already logged in
-    }).catch(e => {
-        if(loggedIn)    // printing error only if the state is inconsistent (i.e., the app was configured to be logged-in)
-            setFeedbackFromError(e);
-        setLoggedIn(false); setUser(null);
-    }); 
-  }, []);
 
   return (
     <div className="min-vh-100 d-flex flex-column">
@@ -139,10 +166,14 @@ function App() {
           <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback}/>} />
           <Route path="/play" element={<Round count={rounds.length} handleEndRound={handleEndRound}
             meme={meme} captions={captions} selectedCaption={selectedCaption} setSelectedCaption={setSelectedCaption}
+            seconds={seconds}
             />}
           />
-          { /** <Route path="/result" element={<NotFoundLayout/>}/> */}
-          { /** <Route path="/games/:id" element={<NotFoundLayout/>}/> */}
+          {game && <Route path="/result" element={<RoundResult  point={game.point} meme={game.meme}
+            correctCaptions={game.bestCaptions} selectedCaption={selectedCaption ? selectedCaption : {"id": -1 , "description": "No caption selected"}}
+          />}
+          />}
+          { <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
           { /** <Route path="/games" element={<NotFoundLayout/>}/> */}
           { /** <Route path="/leaderboard" element={<NotFoundLayout/>}/> */}
           <Route path="*" element={<NotFoundLayout/>}/>    
