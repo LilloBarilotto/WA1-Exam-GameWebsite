@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {Row, Col, ListGroup, ListGroupItem, Button} from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function NotFoundLayout() {
     return (
@@ -49,4 +49,11 @@ function Home(props) {
     );
 };
 
-export { NotFoundLayout, Home}
+function HomeButton() {
+    const navigate = useNavigate();
+      return (
+        <Button variant="outline-light" onClick={()=> navigate('/')}>Go Home</Button>
+      )
+}
+
+export { NotFoundLayout, Home, HomeButton}

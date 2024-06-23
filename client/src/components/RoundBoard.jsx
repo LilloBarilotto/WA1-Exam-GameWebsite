@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import Timer from './Timer.jsx';
 import MemeCard from './Meme.jsx';
 import CaptionCard from './Caption.jsx';
+import { Home, HomeButton } from './PageLayout.jsx';
 
 import API from "../API.mjs";
 
@@ -61,7 +62,7 @@ Round.propTypes = {
 
 function RoundResult(props){
     return (
-        <Container  className="flex-grow-1 d-flex flex-column custom-container bg-light">
+        <Container  className=" mt-3 d-flex flex-column custom-container bg-light ">
             <Row className="mx-auto">
                 <Col>
                     <h3>You scored {props.point} point </h3>
@@ -85,8 +86,7 @@ function RoundResult(props){
                     </Col>
                 </Col>
             </Row>
-        </Container>
-    );
+        </Container>);
 };
 
 function GameResult(){
@@ -105,7 +105,7 @@ function GameResult(){
     if(loading) return (<Container>Loading...</Container>); 
 
     return (
-            <Container className="flex-grow-1 d-flex flex-column">
+        <Container className="flex-grow-1 d-flex flex-column">
             {game.id && <Row className="mx-auto">
                 <Col>   
                     <h3>Your final score is {game.point} . Here the list of your rounds</h3>
