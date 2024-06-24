@@ -20,7 +20,7 @@ function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const [feedback, setFeedback] = useState("Welcome to the game!");
   const navigate = useNavigate();
 
   const [rounds, setRounds] = useState([]);  // array of completed rounds
@@ -114,9 +114,18 @@ function App() {
   };
 
   useEffect (() => { // When the rounds array is updated, the game is completed
-      
     if(rounds.length === 0) return;
-        
+    
+    API.getRoundResults(rounds[rounds.length - 1])
+      .then(res => {
+        if(res.point === 5){
+          setFeedback("Correct! You got 5 points!");
+        }else {
+          setFeedback("Wrong! The correct captions were: '" + res.bestCaptions[0].description + "' and '" + res.bestCaptions[1].description + "' !");
+        }
+    
+      });
+
     if(rounds.length === 1 && anonymousGame){
       API.getRoundResults(rounds[0])
       .then(res => {
@@ -154,8 +163,8 @@ function App() {
       onClose={() => setFeedback('')}
       delay={4000}
       position="top-end"
-      className="position-fixed end-0 m-3"
-    >
+      className="position-fixed end-0 m-3 "  
+    > 
       <ToastBody>{feedback}</ToastBody>
     </Toast>
         <Routes>

@@ -1,4 +1,4 @@
-import { Container, Col, Row, Button, Form, Modal , CardGroup} from 'react-bootstrap';
+import { Container, Col, Row, Button, Form, Modal , CardGroup, ListGroup, Table} from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 
@@ -142,16 +142,29 @@ function GamesResult(){
     if(loading) return (<Container>Loading...</Container>);
 
     return (
-        <Container>
-          {games.map((game) => (
-            <Row key={game.id} className="game-result">
-                <Col><p>Date: {game.date}</p></Col>
-                <Col><p>Score: {game.point}</p></Col>
-                <Col><Button onClick={() => navigate("/games/"+game.id)}>See Details</Button></Col>
-            </Row>
-          ))}
+        <Container className='rounded mt-4 bg-light custom-container'>
+            <Row><h2>Here a list of your games!</h2></Row>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Score</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {games.map((game) => (
+                        <tr key={game.id}>
+                            <td>{game.date}</td>
+                            <td>{game.point}</td>
+                            <td><Button onClick={() => navigate("/games/"+game.id)}>See Details</Button></td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>    
         </Container>
-      );
+    );
+
 
 }
 
