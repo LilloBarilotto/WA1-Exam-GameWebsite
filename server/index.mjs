@@ -243,6 +243,8 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
         })
       ));
 
+      await userDAO.updateUserPoint(req.user.id, game.point);
+
       res.json({id: game_ID})
 
     }catch(error){

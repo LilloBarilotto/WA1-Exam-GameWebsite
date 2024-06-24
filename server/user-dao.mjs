@@ -54,4 +54,16 @@ export default function UserDAO (){
         });
     }
 
+    this.updateUserPoint = (id, point) => {
+        return new Promise((resolve, reject) => {
+            db.run('UPDATE users SET total_point = total_point + ? WHERE id = ?', [point, id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+    
 } 
