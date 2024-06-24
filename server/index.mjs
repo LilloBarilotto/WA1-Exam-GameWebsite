@@ -2,6 +2,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import Joi from 'joi'; 
 
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
@@ -65,7 +66,6 @@ const isLoggedIn = (req, res, next) => {
 
   return res.status(401).json({ error: 'Not authorized' });
 }
-
 
 
 /************************************* USER'S API ****************************************/
@@ -215,6 +215,7 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
     let game_ID = null;
     try{
       let tmp_rounds = req.body;
+
       let rounds = [
         await calculatePoint(tmp_rounds[0]),
         await calculatePoint(tmp_rounds[1]),
@@ -285,7 +286,8 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
 app.post('/api/games/anonymous', async (req, res) => {
   try{
     const round = req.body;
-    const response = await calculatePoint(round);
+
+   const response = await calculatePoint(round);
 
     res.json(response);
   }catch(error){
@@ -293,6 +295,15 @@ app.post('/api/games/anonymous', async (req, res) => {
   };
 });
 
+/** VALIDATE SCHEMA */
+
+const roundSchema = Joi.object({
+  meme_ID: Joi.number().integer().required(),
+  captionsIds: Joi.array().items(Joi.number().integer()).length(7).required(),
+  selected_caption_ID: Joi.number().integer().optional()
+});
+
+const gameSchema = Joi.array().items(roundSchema).length(3).required();
 
 /************************************* Activate the server ****************************************/
 const port=3001;

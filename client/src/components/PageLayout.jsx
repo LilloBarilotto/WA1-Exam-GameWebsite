@@ -1,30 +1,32 @@
 import { useEffect, useState } from "react";
-import {Row, Col, ListGroup, ListGroupItem, Button} from "react-bootstrap";
+import {Row, Col, ListGroup, ListGroupItem, Button, Container} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 
 function NotFoundLayout() {
     return (
-        <>
-            <Row><Col><h2>Error: page not found!</h2></Col></Row>
-            <Row><Col> <img src="/GitHub404.png" alt="page not found" className="my-3" style={{display: 'block'}}/></Col></Row>
-            <Row><Col> <Link to="/" className="btn btn-primary mt-2 my-5">Go Home!</Link> </Col></Row>
-        </>
+        <Container>
+            <Row><img src="/404_not_found.webp" alt="page not found"  className="img-fluid my-3" style={{ maxWidth: '80 %', height: 'auto' }}/></Row>
+            <Row><HomeButton></HomeButton></Row>
+        </Container>
     );
 }
 
 function Home(props) {
 
     return (
-        <>
-        <Row className="mx-auto">
+        <Container className="justify-content-center mb-5">
+        <Row className="mx-auto text-center py-1">
             <Col>
                 <h2>Welcome to the game!</h2>
             </Col>
         </Row>
-        <Row className="mx-auto">
+        <Row className="mx-auto justify-content-center  text-center mb-1">
             <Col> <Button onClick={() => {props.setAnonymousGame(true); props.handleNewRound();}}>Start Anonymous Round </Button></Col>
             { props.loggedIn ? <Col><Button onClick={() => {props.setAnonymousGame(false); props.handleNewRound();}}>Start entire Games (3 Round)</Button></Col> : null }
         </Row>
+        <Row>
+            <Container className="custom-container bg-light">
+                
         <Row><h3>Here some rules:</h3></Row>
         <Row>
             <Col>< ListGroup>
@@ -45,13 +47,15 @@ function Home(props) {
                 <ListGroup.Item>2. See the global ranking of other user, try to beat them!</ListGroup.Item>
             </ListGroup></Col>
         </Row>
-        </>
+            </Container>
+        </Row>
+        </Container>
     );
 };
 
 function HomeButton() {
     const navigate = useNavigate();
-      return (
+      return (      
         <Button variant="outline-light" onClick={()=> navigate('/')}>Go Home</Button>
       )
 }

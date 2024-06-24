@@ -183,9 +183,9 @@ function App() {
             correctCaptions={game.bestCaptions} selectedCaption={game.selectedCaption ? game.selectedCaption : {"id": -1 , "description": "No caption selected"}}
           />}
           />}
-          { <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
-          { <Route path="/games" element={<GamesResult/>}/> }
-          { <Route path="/leaderboard" element={<NotFoundLayout/>} /> }
+          {loggedIn &&  <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
+          {loggedIn &&  <Route path="/games" element={<GamesResult/>}/> }
+          {loggedIn &&  <Route path="/leaderboard" element={<NotFoundLayout/>} /> }
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
       </Container>

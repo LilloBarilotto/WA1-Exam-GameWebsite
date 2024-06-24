@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 
@@ -12,6 +12,7 @@ function LoginForm(props) {
   const [errorMessage, setErrorMessage] = useState('');
 
  const navigate = useNavigate();
+ const location = useLocation();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,7 +30,7 @@ function LoginForm(props) {
   };
 
   return (
-    <Row className="mt-3 vh-100 justify-content-md-center">
+    <Row className="mt-3 justify-content-md-center ">
       <Col md={4} >
         <h1 className="pb-3">Login</h1>
         <Form onSubmit={handleSubmit}>
@@ -82,7 +83,11 @@ LogoutButton.propTypes = {
 function LoginButton() {
 const navigate = useNavigate();
   return (
-    <Button variant="outline-light" onClick={()=> navigate('/login')}>Login</Button>
+    <Button
+      variant={location.pathname === "/login" ? "light" : "outline-light"}
+      onClick={() => navigate("/login")}
+      disabled={location.pathname === "/login"
+    }>Login</Button>
   )
 }
 
