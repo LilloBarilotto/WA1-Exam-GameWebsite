@@ -9,31 +9,59 @@ function Header(props) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    return <header className="py-1 py-md-3 border-bottom bg-primary">
-        <Container fluid className="gap-3 align-items-center ">
+    return <header className="py-1 py-md-2 border-bottom bg-primary">
+        <Container fluid className="gap align-items-center ">
             <Row>
-                <Col md={3}> {/* Adjusted for medium devices and up */}
-                    <span className="h3 mb-0 text-white">What do you meme? </span>
+                <Col > {/* Adjusted for medium devices and up */}
+                    <span className="h3 text-white">What do you meme? </span>
                 </Col> 
-                <Col md={6} className="d-flex justify-content-center">
-                        <Row >
-                            <Col>
-                                <Button variant={location.pathname === "/" ? "light" : "outline-light"}
-                                    onClick={() => navigate("/")}
-                                    disabled={location.pathname === "/"}
-                                > Home
-                                </Button>
-                            </Col>
-                            <Col>
-                                {props.loggedIn && <Button variant={location.pathname === "/games" ? "light" : "outline-light"}
-                                    onClick={() => navigate("/games")}
-                                    disabled={location.pathname === "/games"}
-                                > Games
-                                </Button>}
-                            </Col>
-                        </Row>
-                </Col>
-                <Col md={3}className="d-flex align-items-center justify-content-end"> {/* Adjusted for medium devices and up */}
+                <Col className="d-flex justify-content-center">
+  <Navbar bg="transparent" expand="lg" variant="dark">
+    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+    <Navbar.Collapse id="basic-navbar-nav">
+      <Nav className="me-auto">
+        {props.loggedIn && (
+          <Nav.Link
+            href="/leaderboard"
+            className={location.pathname === "/leaderboard" ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/leaderboard");
+            }}
+            disabled={location.pathname === "/leaderboard"}
+          >
+            Leaderboard
+          </Nav.Link>
+        )}
+        <Nav.Link
+          href="/"
+          className={location.pathname === "/" ? "active" : ""}
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/");
+          }}
+          disabled={location.pathname === "/"}
+        >
+          Home
+        </Nav.Link>
+        {props.loggedIn && (
+          <Nav.Link
+            href="/games"
+            className={location.pathname === "/games" ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/games");
+            }}
+            disabled={location.pathname === "/games"}
+          >
+            Games
+          </Nav.Link>
+        )}
+      </Nav>
+    </Navbar.Collapse>
+  </Navbar>
+</Col>
+                <Col className="d-flex align-items-center justify-content-end"> {/* Adjusted for medium devices and up */}
                     <span className="ml-md-auto">
                         { props.loggedIn ? <LogoutButton logout={props.handleLogout} /> : <LoginButton/>  }
                     </span>

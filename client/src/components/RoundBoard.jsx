@@ -129,15 +129,32 @@ function GameResult(){
 function GamesResult(){
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
     const navigate = useNavigate();
 
     useEffect(() => {
         API.getGames()
-        .then(games => {
-            setGames(games);
-            setLoading(false);
-        })
+            .then(games => {
+                // Assuming games is an array of objects and each game object has a date property
+                const sortedGames = games.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date);
+                });
+                setGames(sortedGames);
+                setLoading(false);
+            })
     }, []);
+
+    const toggleSortOrder = () => {
+        const sortedGames = [...games].sort((a, b) => {
+            if (sortOrder === 'asc') {
+                return new Date(b.date) - new Date(a.date);
+            } else {
+                return new Date(a.date) - new Date(b.date);
+            }
+        });
+        setGames(sortedGames);
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
 
     if(loading) return (<Container>Loading...</Container>);
 
@@ -147,7 +164,7 @@ function GamesResult(){
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th onClick={toggleSortOrder} style={{cursor: 'pointer'}}>Date {sortOrder === 'asc' ? '↓' : '↑'}</th>
                         <th>Score</th>
                         <th>Details</th>
                     </tr>

@@ -15,6 +15,7 @@ import { NotFoundLayout , Home} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
 import Header from './components/Header.jsx';
 import {Round, RoundResult, GameResult, GamesResult} from './components/RoundBoard.jsx';
+import LeaderBoard from './components/LeaderBoard.jsx';
 
 function App() {
 
@@ -87,6 +88,8 @@ function App() {
       .then(() => {
         setUser(null);
         setLoggedIn(false);
+        setFeedback("You have been logged out");
+        navigate('/');
       })
       .catch(err => {
         setFeedback(err.message);
@@ -186,7 +189,7 @@ function App() {
           />}
           {loggedIn &&  <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
           {loggedIn &&  <Route path="/games" element={<GamesResult/>}/> }
-          {loggedIn &&  <Route path="/leaderboard" element={<NotFoundLayout/>} /> }
+          {loggedIn &&  <Route path="/leaderboard" element={<LeaderBoard/>} /> }
           <Route path="*" element={<NotFoundLayout/>}/>    
         </Routes>
       </Container>
