@@ -21,3 +21,14 @@
     border-radius: 5px;        /* Optional: adds rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds shadow */
   }
+
+  .customH2 {
+    
+    text-align: center; /* Center the text */
+    font-size: 24px; /* Increase font size */
+    font-weight: bold; /* Make the font bold */
+    padding: 4px; 
+    background-color: #ECEFF1; /* Add a background color */
+    border-radius: 8px; /* Round the corners */
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}

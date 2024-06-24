@@ -1,4 +1,4 @@
-import { Container, Col, Row, Button, Form, Modal , CardGroup, ListGroup, Table} from 'react-bootstrap';
+import { Container, Col, Row, Button, Form, Modal , CardGroup, ListGroup, Table, Alert} from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 
@@ -68,7 +68,6 @@ function RoundResult(props){
                     <h3>You scored {props.point} point </h3>
                     {props.meme && < MemeCard id={props.meme.id} path_img={props.meme.path_img} />}
                 </Col>
-
                 <Col>
                     <h3>Correct Captions</h3>
                     <CardGroup>
@@ -108,7 +107,7 @@ function GameResult(){
         <Container className="flex-grow-1 d-flex flex-column">
             {game.id && <Row className="mx-auto">
                 <Col>   
-                    <h3>Your final score is {game.point} . Here the list of your rounds</h3>
+                    <h2 className="customH2 mt-2">Your final score is {game.point} . Here the list of your rounds</h2    >
                 </Col>
             </Row>}
             {game.rounds && game.rounds.map((round) => (

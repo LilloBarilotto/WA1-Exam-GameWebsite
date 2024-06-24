@@ -9,66 +9,65 @@ function Header(props) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    return <header className="py-1 py-md-2 border-bottom bg-primary">
-        <Container fluid className="gap align-items-center ">
-            <Row>
-                <Col > {/* Adjusted for medium devices and up */}
-                    <span className="h3 text-white">What do you meme? </span>
-                </Col> 
-                <Col className="d-flex justify-content-center">
-  <Navbar bg="transparent" expand="lg" variant="dark">
-    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-    <Navbar.Collapse id="basic-navbar-nav">
-      <Nav className="me-auto">
-        {props.loggedIn && (
-          <Nav.Link
-            href="/leaderboard"
-            className={location.pathname === "/leaderboard" ? "active" : ""}
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/leaderboard");
-            }}
-            disabled={location.pathname === "/leaderboard"}
-          >
-            Leaderboard
-          </Nav.Link>
-        )}
-        <Nav.Link
-          href="/"
-          className={location.pathname === "/" ? "active" : ""}
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("/");
-          }}
-          disabled={location.pathname === "/"}
-        >
-          Home
-        </Nav.Link>
-        {props.loggedIn && (
-          <Nav.Link
-            href="/games"
-            className={location.pathname === "/games" ? "active" : ""}
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/games");
-            }}
-            disabled={location.pathname === "/games"}
-          >
-            Games
-          </Nav.Link>
-        )}
-      </Nav>
-    </Navbar.Collapse>
-  </Navbar>
-</Col>
-                <Col className="d-flex align-items-center justify-content-end"> {/* Adjusted for medium devices and up */}
-                    <span className="ml-md-auto">
-                        { props.loggedIn ? <LogoutButton logout={props.handleLogout} /> : <LoginButton/>  }
-                    </span>
-                </Col>
-            </Row>
-        </Container>
-    </header>;
+    return (
+        <header>
+          <Navbar bg="primary" variant="dark" expand="lg" className="py-1 py-md-2 border-bottom">
+            <Container fluid className="align-items-center">
+              <Navbar.Brand className="text-white h2"
+                onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+                }}
+              >What do you meme?
+              </Navbar.Brand>
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-center">
+                <Nav className="me-auto ms-auto justify-content-center" id="centered-navbar">
+                  {props.loggedIn && (
+                    <Nav.Link
+                      className={location.pathname === "/leaderboard" ? "active" : ""}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/leaderboard");
+                      }}
+                      disabled={location.pathname === "/leaderboard"}
+                    >
+                      Leaderboard
+                    </Nav.Link>
+                  )}
+                  <Nav.Link
+                    className={location.pathname === "/" ? "active" : ""}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate("/");
+                    }}
+                    disabled={location.pathname === "/"}
+                  >
+                    Home
+                  </Nav.Link>
+                  {props.loggedIn && (
+                    <Nav.Link
+                      className={location.pathname === "/games" ? "active" : ""}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/games");
+                      }}
+                      disabled={location.pathname === "/games"}
+                    >
+                      Games
+                    </Nav.Link>
+                  )}
+                </Nav>
+                <Nav>
+                  <Nav.Item className="ml-md-auto">
+                    {props.loggedIn ? <LogoutButton logout={props.handleLogout} /> : <LoginButton />}
+                  </Nav.Item>
+                </Nav>
+              </Navbar.Collapse>
+            </Container>
+          </Navbar>
+        </header>
+      );
 }
 
 
