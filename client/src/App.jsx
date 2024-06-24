@@ -77,7 +77,7 @@ function App() {
         setFeedback("Welcome back, " + user.nickname + "!");
       })
       .catch(err => {
-        setFeedback(err.message);
+        setFeedback("Invalid email and/or password");
       });
   };
 

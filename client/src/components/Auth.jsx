@@ -19,14 +19,14 @@ function LoginForm(props) {
     const credentials = { username, password };
 
     props.handleLogin(credentials)
-      .then ( () => navigate( "/" ) )
-      .catch( (err) => {
-        if(err.message === "Unauthorized")
+      .then ( (user) =>{
+        if(user !== undefined)
+          navigate( "/" )
+        else{
           setErrorMessage("Invalid email and/or password");
-        else
-          setErrorMessage(err.message);
-        setShow(true);
-      });
+          setShow(true);
+        }
+      })
   };
 
   return (

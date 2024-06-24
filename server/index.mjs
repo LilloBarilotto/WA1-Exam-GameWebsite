@@ -118,7 +118,7 @@ app.get('/api/users', (req, res) => {
 app.post('/api/memes/random', async (req, res) => {
   try {
 
-    const meme = await memeDAO.getRandMeme(req.body.ids || []);
+    const meme = await memeDAO.getRandMeme(req.body || []);
   
     const bestcaptions = await captionDAO.getBestCaption(meme.id);
   
@@ -246,8 +246,6 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
       res.json({id: game_ID})
 
     }catch(error){
-      console.log(error)
-      console.log(game_ID)
       if (game_ID)
         gameDAO.deleteGame(game_ID);
       res.status(500).end();
@@ -268,8 +266,6 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
       await recreateRound(temp_rounds[1]),
       await recreateRound(temp_rounds[2])
     ]
-
-    console.log(rounds);
 
     const response = {
       ...game,
