@@ -20,10 +20,10 @@ function Round(props){
     }, [props.selectedCaption]);
 
     return (
-        <Container className="flex-grow-1 d-flex flex-column">
+        <Container className="mt-3 d-flex flex-column custom-container bg-light ">
             <Row><h1>Round {props.count + 1 }</h1></Row>
             <Row className="mx-auto">
-                <Col>
+                <Col md={8} >
                     {props.meme && < MemeCard id={props.meme.id} path_img={props.meme.path_img} />}
                 </Col>
                 <Col>

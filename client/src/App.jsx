@@ -161,9 +161,10 @@ function App() {
       show={feedback !== ''}
       autohide
       onClose={() => setFeedback('')}
-      delay={4000}
+      delay={6000}
       position="top-end"
-      className="position-fixed end-0 m-3 "  
+      className="position-fixed end-0 m-3"
+      style={{ zIndex: 9999 }}  
     > 
       <ToastBody>{feedback}</ToastBody>
     </Toast>
