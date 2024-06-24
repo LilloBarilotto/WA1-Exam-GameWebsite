@@ -75,6 +75,7 @@ function App() {
         setUser(user);
         setLoggedIn(true);
         setFeedback("Welcome back, " + user.nickname + "!");
+        return user;
       })
       .catch(err => {
         setFeedback("Invalid email and/or password");
@@ -173,7 +174,7 @@ function App() {
                 setAnonymousGame={setAnonymousGame}    
             />}
           />
-          <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback}/>} />
+          <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback} user={user}/>} />
           <Route path="/play" element={<Round count={rounds.length} handleEndRound={handleEndRound}
             meme={meme} captions={captions} selectedCaption={selectedCaption} setSelectedCaption={setSelectedCaption}
             seconds={seconds}
