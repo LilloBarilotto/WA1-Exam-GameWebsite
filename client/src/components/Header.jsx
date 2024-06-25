@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
-import { Col, Container, Row } from "react-bootstrap";
+import { Container} from "react-bootstrap";
 import { LoginButton, LogoutButton } from "./Auth";
 
-import { Navbar, Nav , Button} from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function Header(props) {

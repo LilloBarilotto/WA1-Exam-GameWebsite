@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 
@@ -12,14 +12,13 @@ function LoginForm(props) {
   const [errorMessage, setErrorMessage] = useState('');
 
  const navigate = useNavigate();
- const location = useLocation();
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const credentials = { username, password };
 
     props.handleLogin(credentials)
-    .then ( (user) => navigate( "/" ) )
+    .then ( () => navigate( "/" ) )
     .catch( (err) => {
       if(err.message === "Unauthorized")
         setErrorMessage("Invalid email and/or password");

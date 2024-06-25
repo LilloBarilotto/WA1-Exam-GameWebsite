@@ -1,4 +1,4 @@
-import { Container, Col, Row, Button, Form, Modal , CardGroup, ListGroup, Table, Alert} from 'react-bootstrap';
+import { Container, Col, Row, Button, CardGroup, Table } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useParams , useNavigate} from 'react-router-dom';
 
@@ -7,7 +7,6 @@ import PropTypes from "prop-types";
 import Timer from './Timer.jsx';
 import MemeCard from './Meme.jsx';
 import CaptionCard from './Caption.jsx';
-import { Home, HomeButton } from './PageLayout.jsx';
 
 import API from "../API.mjs";
 
