@@ -6,7 +6,9 @@ function NotFoundLayout() {
     return (
         <Container>
             <Row><img src="/404_not_found.webp" alt="page not found"  className="img-fluid my-3" style={{ maxWidth: '80 %', height: 'auto' }}/></Row>
-            <Row><HomeButton></HomeButton></Row>
+            <Row >
+                <Col className="justify-content-center"><HomeButton></HomeButton></Col>
+            </Row>
         </Container>
     );
 }
@@ -56,7 +58,7 @@ function Home(props) {
 function HomeButton() {
     const navigate = useNavigate();
       return (      
-        <Button variant="outline-light" onClick={()=> navigate('/')}>Go Home</Button>
+        <Button variant="primary" onClick={()=> navigate('/')}>Go Home</Button>
       )
 }
 

@@ -11,7 +11,7 @@ function Header(props) {
 
     return (
         <header>
-          <Navbar bg="primary" variant="dark" expand="lg" className="py-1 py-md-2 border-bottom">
+          <Navbar bg="primary" variant="dark" expand="lg" className="py-1 py-md-2 border-bottom mynavbar fixed-top">
             <Container fluid className="align-items-center">
               <Navbar.Brand className="text-white h2"
                 onClick={(e) => {

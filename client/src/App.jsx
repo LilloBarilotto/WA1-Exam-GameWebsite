@@ -160,7 +160,7 @@ function App() {
   return (
     <div className="min-vh-100 d-flex flex-column">
     <Header loggedIn={loggedIn} handleLogout={handleLogout}/>
-      <Container fluid className="flex-grow-1 d-flex flex-column">
+      <Container fluid className="flex-grow-1 d-flex flex-column container-padding-top">
       <Toast
       show={feedback !== ''}
       autohide

@@ -33,7 +33,7 @@ const LeaderBoard = () => {
                 </thead>
                 <tbody>
                      {leaderboardData.map((user, index) => (
-                        <tr key={user.id}>
+                        <tr key={index + 1}>
                             <td>{index + 1}</td>
                             <td>{user.nickname}</td>
                             <td>{user.total_point}</td>
