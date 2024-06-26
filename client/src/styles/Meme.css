@@ -1,0 +1,14 @@
+/* MemeCard.css */
+.MemeCard {
+    max-width: auto; /* Ensures the card does not exceed the width of its container */
+    height: 40vh; /* Allows the card to adjust its height based on the image */
+  }
+  
+  .MemeImage {
+    padding: auto;
+    margin: auto; /* Centers the card if it's smaller than the container */
+    max-width: 100%; /* Ensures the image does not exceed its natural width or the card's width */
+    max-height: 100%; /* Prevents the image from exceeding the card's height */
+  }
+
+

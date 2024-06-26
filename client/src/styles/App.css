@@ -1,0 +1,38 @@
+.error-message {
+    color: red;
+  }
+  
+  .wrong-field {
+    border-color: red;
+    border-width: 2px;
+  } 
+
+
+  body{
+    background: rgb(255,255,255);
+    background: -moz-linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(241,253,255,1) 16%, rgba(102,229,255,1) 79%, rgba(0,212,255,1) 100%);
+    background: -webkit-linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(241,253,255,1) 16%, rgba(102,229,255,1) 79%, rgba(0,212,255,1) 100%);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(241,253,255,1) 16%, rgba(102,229,255,1) 79%, rgba(0,212,255,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#00d4ff",GradientType=1); 
+  }
+  .custom-container {
+    border: 1px solid rgba(0, 0, 0, 0.523);   /* Adds a border */
+    padding: 10px;             /* Adds padding inside the border */
+    border-radius: 5px;        /* Optional: adds rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds shadow */
+  }
+
+  .customH2 {
+    
+    text-align: center; /* Center the text */
+    font-size: 24px; /* Increase font size */
+    font-weight: bold; /* Make the font bold */
+    padding: 4px; 
+    background-color: #ECEFF1; /* Add a background color */
+    border-radius: 8px; /* Round the corners */
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.container-padding-top {
+  padding-top: 70px; /* Adjust based on the height of your NavBar */
+}
