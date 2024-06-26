@@ -228,7 +228,7 @@
 |          username         |     password    | nickname | Details                |
 |:-------------------------:|:---------------:|:--------:|------------------------|
 | lillo.barilotto@gmail.com | lillo.barilotto |   Lillo  | Has some history games |
-|   luca.manganella@polito.it   |   luca.manganella   |   Luca  |                        |
+|   luca.manganella@hknpolito.org   |   luca.manganella   |   Luca  |                        |
 |         ddr@hknpolito.org                  |           ddr      |     DajeRoma     |                        |
 |            marco.marco@marco.org               |         marco        |    Marco      |                        |
 |               plsgiveme30L@plsfulvio.org            |         loveyou        |     LoveYou     |                        |
