@@ -178,7 +178,7 @@ function App() {
             />}
           />
           <Route path="/login" element={<LoginForm handleLogin={handleLogin} feedback={feedback} user={user}/>} />
-          <Route path="/play" element={<Round count={rounds.length} handleEndRound={handleEndRound}
+          <Route path="/play" element={<Round count={rounds.length +1} handleEndRound={handleEndRound}
             meme={meme} captions={captions} selectedCaption={selectedCaption} setSelectedCaption={setSelectedCaption}
             seconds={seconds}
             />}

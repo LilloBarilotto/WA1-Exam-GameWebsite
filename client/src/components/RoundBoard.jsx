@@ -21,7 +21,7 @@ function Round(props){
 
     return (
         <Container className="mt-3 d-flex flex-column custom-container bg-light ">
-            <Row><h1>Round {props.count + 1 }</h1></Row>
+            <Row><h1>Round {props.count}</h1></Row>
             <Row className="mx-auto">
                 <Col md={8} >
                     {props.meme && < MemeCard id={props.meme.id} path_img={props.meme.path_img} />}
