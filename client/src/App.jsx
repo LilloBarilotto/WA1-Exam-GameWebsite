@@ -11,7 +11,7 @@ import './styles/Meme.css';
 
 import API from "./API.mjs";
 
-import { NotFoundLayout , Home} from './components/PageLayout.jsx';
+import { NotFoundLayout , Home, ErrorLayout} from './components/PageLayout.jsx';
 import { LoginForm }  from './components/Auth.jsx';
 import Header from './components/Header.jsx';
 import {Round, RoundResult, GameResult, GamesResult} from './components/RoundBoard.jsx';
@@ -32,6 +32,17 @@ function App() {
   const [anonymousGame, setAnonymousGame] = useState(false);
   const [game, setGame] = useState(null);
   const [seconds, setSeconds] = useState(0);
+
+  const cleanUp = () => {
+    setRounds([]);
+    setMeme(null);
+    setCaptions([]);
+    setSelectedCaption(null);
+    setAnonymousGame(false);
+    setGame(null);
+    setSeconds(0);
+
+  } 
 
    // every useEffect has 2 calls because of the strict mode (Trust completely stackoverflow)
    useEffect(() => {
@@ -127,7 +138,10 @@ function App() {
         }else {
           setFeedback("Wrong! The correct captions were: '" + res.bestCaptions[0].description + "' and '" + res.bestCaptions[1].description + "' !");
         }
-    
+      }).catch(err => {
+        setFeedbackFromError(err);
+        cleanUp();
+        navigate('/error');
       });
 
     if(rounds.length === 1 && anonymousGame){
@@ -150,7 +164,12 @@ function App() {
         setSeconds(0);
 
         navigate('/games/' + game.id);
-      })
+      }).catch(err => {
+        setFeedbackFromError(err);
+        cleanUp();
+        navigate('/error');
+      });
+
     } else{
       handleNewRound();
     }
@@ -190,7 +209,8 @@ function App() {
           {loggedIn &&  <Route path="/games/:id" element={<GameResult game={game} handleGetGame={handleGetGame} />}/>}
           {loggedIn &&  <Route path="/games" element={<GamesResult/>}/> }
           {loggedIn &&  <Route path="/leaderboard" element={<LeaderBoard/>} /> }
-          <Route path="*" element={<NotFoundLayout/>}/>    
+          <Route path="/error" element={<ErrorLayout/>}/>  
+          <Route path="*" element={<NotFoundLayout/>}/>  
         </Routes>
       </Container>
     </div>

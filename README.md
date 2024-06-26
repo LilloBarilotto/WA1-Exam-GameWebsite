@@ -7,23 +7,33 @@
 - Route `/`: show the homepage and the button to start the anonymous game (1 round). If logged in, another button to play an entire game (3 rounds)
 - Route `/leaderboard`: show the leaderboard and scores of all registered users, with a focus on the top 3.
 - Route `/games`: if logged in, show the games history of the logged user. 
-
-- Route `/play`: star a new anonymous round 
-- Route `/games/play`: star a round for a game
-
+- Route `/play`: star a new game
 - Route `/result`: show the result of the anonymous round.
 - Route `/games/:game-id`: show more info about the result of a single games, with specific info about all the 3 rounds, the 2 corrected captions, the chosed one, and the total point per round.
 
 - Route `/login`:  route to login by using credentials (username and password)
-- Route `/404`: this route will be shown in case an invalid route is requested.
+- Route `/*`: this route will be shown in case an invalid route is requested.
 
 ## Main React Components
+- `Header` (in `Header.jsx`): Render the Navbar used in all the pages.
+- `Home` (in `PageLayout.jsx`): Render a meme through the provided image.
+- `NotFoundLayout` (in `PageLayout.jsx`): Shows a blank page if you search for an item that doesn't exist.
 
-- `ListOfSomething` (in `List.js`): component purpose and main functionality
-- `GreatButton` (in `GreatButton.js`): component purpose and main functionality
-- ...
 
-(only _main_ components, minor ones may be skipped)
+- `Round` (in `RoundBoard.jsx`): It manages the retrieval of information and the rendering of a new round to play.
+
+
+- `RoundResult` (in `RoundBoard.jsx`): Shows the results of a specific round being passed through the props
+- `GameResult` (in `RoundBoard.jsx`): Shows the total score of a game that was retrieved through the API and the id retrieved from the parameters. Reuse the "RoundResult" component 3 times.
+- `GamesResult` (in `RoundBoard.jsx`): Shows the games of a given player, using a useState and useEffect to also manage the order of the games themselves by date.
+
+- `MemeCard` (in `Meme.jsx`): Render a meme using the provided image and Bootstrap Cards
+
+- `CaptionCard` (in `Caption.jsx`): Render a meme using the Bootstrap Cards
+
+
+- `Timer` (in `Timer.jsx`): It manages the Timer and its graphic display, using an internal counter that decreases every 1000ms and calls the function passed as a parameter as soon as the timer (set through the props.) reaches 0.
+- `LoginForm` (in `Auth.jsx`): Form that manages the insertion of user credentials.
 
 
 ## API Server
@@ -94,7 +104,6 @@
     - request body: Info about the 3 rounds and the memes used (example below)
     ```
     {
-      "date" : "2024-06-28"
       "rounds" : [
         {
           "captionIds": [1,2,3,4,5,6,7],
@@ -175,7 +184,7 @@
     ```
     - response code: `200`
     - response body content: More detailed info about the round, and the result point 
-    - error response code: ` `500` if there is an error
+    - error response code: `422` if body content not valid ,`500` if there is an error
     ```
     {  
           "id" : 1,
@@ -196,12 +205,12 @@
     ```
 ## Database Tables
 
--  `users` - (id, username, email, password, salt, total_point)
+-  `users` - (id, username, nickname, password, salt, total_point)
 -  `memes` - (id, path_img)
 -  `captions` - (id, description)
 -  `best_captions` - (meme_ID, caption_ID)
 -  `rounds` - (id, meme_ID, first_best_caption_ID, second_best_caption_ID, selected_caption_ID, point, game_ID)
--  `games` - (id, user_id, date, total_point)
+-  `games` - (id, user_ID, date, total_point)
 
 ## Screenshots
 

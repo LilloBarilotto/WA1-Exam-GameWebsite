@@ -216,6 +216,12 @@ app.post('/api/games', isLoggedIn, async (req, res) => {
     try{
       let tmp_rounds = req.body;
 
+      // Validate the request body against the schema
+      const { error } = gameSchema.validate(tmp_rounds);
+      if (error) {
+        return res.status(422).json({ error: error.details[0].message });
+      }
+
       let rounds = [
         await calculatePoint(tmp_rounds[0]),
         await calculatePoint(tmp_rounds[1]),
@@ -283,7 +289,11 @@ app.get('/api/games/:id', isLoggedIn, async (req, res) => {
 
 app.post('/api/games/anonymous', async (req, res) => {
   try{
-    const round = req.body;
+   const round = req.body;
+   const { error } = roundSchema.validate(round);
+   if (error) {
+     return res.status(422).json({ error: error.details[0].message });
+   }
 
    const response = await calculatePoint(round);
 
@@ -298,7 +308,7 @@ app.post('/api/games/anonymous', async (req, res) => {
 const roundSchema = Joi.object({
   meme_ID: Joi.number().integer().required(),
   captionsIds: Joi.array().items(Joi.number().integer()).length(7).required(),
-  selected_caption_ID: Joi.number().integer().optional()
+  selected_caption_ID: Joi.number().integer().allow(null).optional()
 });
 
 const gameSchema = Joi.array().items(roundSchema).length(3).required();

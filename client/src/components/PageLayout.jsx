@@ -1,17 +1,29 @@
-import { useEffect, useState } from "react";
 import {Row, Col, ListGroup, ListGroupItem, Button, Container} from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function NotFoundLayout() {
     return (
         <Container>
-            <Row><img src="/404_not_found.webp" alt="page not found"  className="img-fluid my-3" style={{ maxWidth: '80 %', height: 'auto' }}/></Row>
+            <Row><img src="/404_not_found.webp" alt="page not found"  className="img-fluid my-3" style={{ maxWidth: '80%', height: 'auto' }}/></Row>
             <Row >
                 <Col className="justify-content-center"><HomeButton></HomeButton></Col>
             </Row>
         </Container>
     );
 }
+
+function ErrorLayout() {
+    return (
+        <Container>
+            <Row  className="justify-content-center"><img src="/422-status-code.png" alt="422 status code page"  className="img-fluid my-3" style={{ maxWidth: '60%', height: 'auto' }}/></Row>
+            <Row><Col className="justify-content-center"><p className="h3"> The content that you try to sent into our website has changed in unexpected way, please try again. The changes will not be insert in our website.</p></Col></Row>
+            <Row >
+                <Col className="justify-content-center"><HomeButton></HomeButton></Col>
+            </Row>
+        </Container>
+    );
+}
+
 
 function Home(props) {
 
@@ -74,4 +86,4 @@ function NotAuthorizedPage () {
 
 }
 
-export { NotFoundLayout, Home, HomeButton, NotAuthorizedPage}
+export { NotFoundLayout, Home, HomeButton, NotAuthorizedPage, ErrorLayout}
