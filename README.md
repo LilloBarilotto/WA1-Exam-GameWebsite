@@ -213,17 +213,22 @@
 -  `games` - (id, user_ID, date, total_point)
 
 ## Screenshots
+![alt text](<screenshot/Homepage Logged User.png>) 
 
-![Screenshot1](./img/screenshot.jpg)
+![alt text](<screenshot/Play a round.png>)
+![alt text](<screenshot/Anonymous Round Result.png>)
+![alt text](<screenshot/GET games.png>) 
+![alt text](<screenshot/GET games-id.png>) 
 
-![Screenshot2](./img/screenshot.jpg)
-
+![alt text](screenshot/LeaderBoard.png) 
+![alt text](screenshot/404.png) 
+![alt text](<screenshot/422 screenshot.png>) 
 
 ## Users Credentials
 |          username         |     password    | nickname | Details                |
 |:-------------------------:|:---------------:|:--------:|------------------------|
 | lillo.barilotto@gmail.com | lillo.barilotto |   Lillo  | Has some history games |
-|   luca.manganella@polito.it   |   luca.manganella   |   Luca  |  Has only 0 points                      |
+|   luca.manganella@polito.it   |   luca.manganella   |   Luca  |                        |
 |         ddr@hknpolito.org                  |           ddr      |     DajeRoma     |                        |
 |            marco.marco@marco.org               |         marco        |    Marco      |                        |
 |               plsgiveme30L@plsfulvio.org            |         loveyou        |     LoveYou     |                        |
