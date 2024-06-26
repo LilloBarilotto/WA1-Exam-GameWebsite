@@ -62,4 +62,16 @@ function HomeButton() {
       )
 }
 
-export { NotFoundLayout, Home, HomeButton}
+function NotAuthorizedPage () {
+    return (
+        <Container className="d-flex flex-column align-items-center justify-content-center">
+            <Row><img src="/error_401.png" alt="not authorized view" className="img-fluid" style={{ height: 'auto' }} /></Row>
+            <Row className="justify-content-center">
+                <Col className="justify-content-center"><HomeButton></HomeButton></Col>
+            </Row>
+        </Container>
+    );
+
+}
+
+export { NotFoundLayout, Home, HomeButton, NotAuthorizedPage}

@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import Timer from './Timer.jsx';
 import MemeCard from './Meme.jsx';
 import CaptionCard from './Caption.jsx';
+import { NotAuthorizedPage } from './PageLayout.jsx';
 
 import API from "../API.mjs";
 
@@ -91,6 +92,7 @@ function GameResult(){
     let { id } = useParams();
     const [game, setGame] = useState({});
     const [loading, setLoading] = useState(true);
+    const [err, setErr] = useState(false);
 
     useEffect(() => {
         API.getGame(id)
@@ -98,28 +100,34 @@ function GameResult(){
             setGame(g);
             setLoading(false);
         })
+        .catch(e => {
+            setErr(true);
+            setLoading(false);
+        });
+
     }, [id]);
 
     if(loading) return (<Container>Loading...</Container>); 
+    if(err) return (<NotAuthorizedPage />);
 
     return (
-        <Container className="flex-grow-1 d-flex flex-column">
-            {game.id && <Row className="mx-auto">
-                <Col>   
-                    <h2 className="customH2 mt-2">Your final score is {game.point} . Here the list of your rounds</h2    >
-                </Col>
-            </Row>}
-            {game.rounds && game.rounds.map((round) => (
-                <Row key={round.id} className="mx-auto">
-                    <RoundResult point={round.point} meme={round.meme} correctCaptions={round.bestCaptions}
-                      selectedCaption={
-                        round.selectedCaption && Object.keys(round.selectedCaption).length > 0 
-                          ? round.selectedCaption 
-                          : { "id": -1, "description": "No caption selected" }
-                      } />
-                </Row>
-            ))}
-        </Container>
+                <Container className="flex-grow-1 d-flex flex-column">
+                    {game.id && <Row className="mx-auto">
+                        <Col>
+                            <h2 className="customH2 mt-2">Your final score is {game.point}. Here the list of your rounds</h2>
+                        </Col>
+                    </Row>}
+                    {game.rounds && game.rounds.map((round) => (
+                        <Row key={round.id} className="mx-auto">
+                            <RoundResult point={round.point} meme={round.meme} correctCaptions={round.bestCaptions}
+                                selectedCaption={
+                                    round.selectedCaption && Object.keys(round.selectedCaption).length > 0
+                                        ? round.selectedCaption
+                                        : { "id": -1, "description": "No caption selected" }
+                                } />
+                        </Row>
+                    ))}
+                </Container>
     );
 };
 
