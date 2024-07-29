@@ -1,6 +1,17 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/AVMm0VzU)
 # Exam #42: "Meme Game"
-## Student: s322848 GUZZONE SEBASTIANO 
+## Student: s322848 GUZZONE SEBASTIANO
+Tips for those preparing for the exam to get the most out of it:
+- completely follow and satisfy all the requirements of the text provided by the professors
+- create consistency at GUI level
+- try to simplify the code and use and reuse the React components as best as possible
+- don't overuse some features like UseEffect
+
+If in doubt, always double-check the requirements before contacting the professors.
+They are very helpful, but in my experience most questions asked of professors can be avoided by looking at the text requirements.
+
+Ps. Don't totally copy mine or others' project on GitHub, try to understand as much as possible how it works and some implementations!
+I wish you the best in your university studies!
 
 ## React Client Application Routes
 
